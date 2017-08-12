@@ -19,6 +19,6 @@
     <string name="nav_texts">Mes textes</string>
     <string name="nav_projects">Mes projets</string>
     <string name="nav_settings">Mes options</string>
-    <string name="nav_friends">Mes amis</string>
+    <string name="nav_friends">Mes contacts</string>
     <string name="nav_msg">Mes messages</string>
 </resources>

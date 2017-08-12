@@ -48,6 +48,17 @@ public class FragmentGeneral extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_gnrl, container, false);
         ((TextView)view.findViewById(R.id.titelelele)).setText("En cours : " + mIndex);
+
+        ((TextView)view.findViewById(R.id.top4Lyrics).findViewById(R.id.top1)).setText("1. Deus Ex Gaminho");
+        ((TextView)view.findViewById(R.id.top4Lyrics).findViewById(R.id.top2)).setText("2. Vox Agora");
+        ((TextView)view.findViewById(R.id.top4Lyrics).findViewById(R.id.top3)).setText("3. Loin");
+        ((TextView)view.findViewById(R.id.top4Lyrics).findViewById(R.id.top4)).setText("4. Thomas Hobbes");
+
+        ((TextView)view.findViewById(R.id.top4Projects).findViewById(R.id.top1)).setText("1. POB 2");
+        ((TextView)view.findViewById(R.id.top4Projects).findViewById(R.id.top2)).setText("2. A2Z");
+        ((TextView)view.findViewById(R.id.top4Projects).findViewById(R.id.top3)).setText("3.");
+        ((TextView)view.findViewById(R.id.top4Projects).findViewById(R.id.top4)).setText("4.");
+
         return view;
     }
 
