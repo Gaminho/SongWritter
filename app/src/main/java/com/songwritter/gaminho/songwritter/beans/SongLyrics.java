@@ -53,7 +53,6 @@ public class SongLyrics {
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
-                ", author='" + author + '\'' +
-                '}';
+                ", author='" + author + '\'' + '}';
     }
 }
