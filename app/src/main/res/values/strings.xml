@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SongWritter</string>
+    <string name="uptodate">Données à jour</string>
+    <string name="needUpdate">Mise à jour disponible</string>
+</resources>
