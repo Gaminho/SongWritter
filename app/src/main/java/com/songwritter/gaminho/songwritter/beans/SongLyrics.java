@@ -1,7 +1,9 @@
 package com.songwritter.gaminho.songwritter.beans;
 
 
-public class SongLyrics {
+import java.io.Serializable;
+
+public class SongLyrics implements Serializable {
 
     private String id;
     private String title;

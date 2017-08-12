@@ -26,12 +26,17 @@
     <EditText
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:inputType="textCapSentences|textMultiLine"
+        android:hint="@string/ph_title"/>
 
     <EditText
         android:layout_marginTop="5dp"
         android:id="@+id/etContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:inputType="textCapSentences|textMultiLine"
+        android:gravity="top"
+        android:hint="@string/ph_content"/>
 
 </LinearLayout>
