@@ -2,6 +2,7 @@ package com.songwritter.gaminho.songwritter.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.songwritter.gaminho.songwritter.R;
 
 public class IndexActivity extends AppCompatActivity
@@ -64,6 +67,24 @@ public class IndexActivity extends AppCompatActivity
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     updateHeaderView(R.layout.drawer_header_connected, "Connecté en tant que " + user.getDisplayName());
+
+//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+//                            .setDisplayName("Gaminho")
+//                            .setPhotoUri(Uri.parse("findicons.com/files/icons/1072/face_avatars/300/a04.png"))
+//                            .build();
+//
+//                    user.updateProfile(profileUpdates)
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    if (task.isSuccessful()) {
+//                                        Log.e("Update", "User profile updated.");
+//                                    }
+//                                }
+//                            });
+
+
+
                 } else {
                     updateHeaderView(R.layout.drawer_header_not_connected, "Non connecté");
                 }
@@ -187,6 +208,16 @@ public class IndexActivity extends AppCompatActivity
         LayoutInflater inflater = getLayoutInflater();
         View view = inflater.inflate(layout, null, false);
         ((TextView) view.findViewById(R.id.connectedAs)).setText(headerText);
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+        if(user != null){
+            Log.e("USER", user.toString());
+            ((ImageView) view.findViewById(R.id.userPix)).setImageURI(user.getPhotoUrl());
+            ((TextView) view.findViewById(R.id.connectedAs)).setText("Connecté en tant que " + user.getDisplayName());
+        }
+
+
 
         if(layout == R.layout.drawer_header_not_connected) {
             view.findViewById(R.id.signin).setOnClickListener(new View.OnClickListener() {
