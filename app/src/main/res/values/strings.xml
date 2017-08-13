@@ -3,7 +3,6 @@
     <string name="uptodate">Données à jour</string>
     <string name="needUpdate">Mise à jour disponible</string>
 
-
     <!-- placeholders -->
     <string name="ph_title">Title</string>
     <string name="ph_content">Lyrics</string>
@@ -13,7 +12,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
-
 
     <string name="nav_grl">Vue d\'ensemble</string>
     <string name="nav_texts">Mes textes</string>

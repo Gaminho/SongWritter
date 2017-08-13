@@ -3,19 +3,38 @@ package com.songwritter.gaminho.songwritter.activities;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.songwritter.gaminho.songwritter.R;
 
 public class IndexActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    //Views
+    private NavigationView navigationView;
+
+    //Authentication
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +42,6 @@ public class IndexActivity extends AppCompatActivity
         setContentView(R.layout.activity_index);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        loadFragment(FragmentGeneral.newInstance(), "Hey oh");
 
         /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -37,8 +54,36 @@ public class IndexActivity extends AppCompatActivity
         });
         */
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    updateHeaderView(R.layout.drawer_header_connected, "Connecté en tant que " + user.getDisplayName());
+                } else {
+                    updateHeaderView(R.layout.drawer_header_not_connected, "Non connecté");
+                }
+            }
+        };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadFragment(FragmentGeneral.newInstance(), "Hey oh");
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 
     @Override
@@ -52,14 +97,13 @@ public class IndexActivity extends AppCompatActivity
     }
 
 
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         Fragment fragment = null;
         String label = "";
 
-        switch(id){
+        switch (id) {
             case R.id.nav_grl:
                 loadFragment(FragmentGeneral.newInstance(1), getString(R.string.nav_grl));
                 return true;
@@ -85,7 +129,7 @@ public class IndexActivity extends AppCompatActivity
                 break;
         }
 
-        Toast.makeText(getApplicationContext(), "'"+label+"' n'est pas disponible !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "'" + label + "' n'est pas disponible !", Toast.LENGTH_SHORT).show();
         return false;
     }
 
@@ -114,7 +158,10 @@ public class IndexActivity extends AppCompatActivity
     }
     */
 
-    private void loadFragment(Fragment fragment, String label){
+
+    // Managing UI
+
+    private void loadFragment(Fragment fragment, String label) {
 
         FragmentManager fragmentManager = getFragmentManager();
 
@@ -133,6 +180,45 @@ public class IndexActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+    }
+
+    private void updateHeaderView(int layout, String headerText) {
+        navigationView.removeHeaderView(navigationView.getHeaderView(0));
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(layout, null, false);
+        ((TextView) view.findViewById(R.id.connectedAs)).setText(headerText);
+
+        if(layout == R.layout.drawer_header_not_connected) {
+            view.findViewById(R.id.signin).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.e("Click", "SignIn");
+                    mAuth.signInWithEmailAndPassword("goldenglawi@gmail.com", "Rhomer91")
+                            .addOnCompleteListener(IndexActivity.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    Log.e("Click", "signInWithEmail:onComplete:" + task.isSuccessful());
+
+                                    if (!task.isSuccessful()) {
+                                        Log.e("Click", "signInWithEmail:failed", task.getException());
+                                    }
+
+                                }
+                            });
+                }
+            });
+        }
+        else{
+            view.findViewById(R.id.sign_out).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.e("Click", "SignOut");
+                    mAuth.signOut();
+                }
+            });
+        }
+
+        navigationView.addHeaderView(view);
     }
 
 }

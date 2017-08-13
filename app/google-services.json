@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "181429275326",
+    "firebase_url": "https://songwritter-377b0.firebaseio.com",
+    "project_id": "songwritter-377b0",
+    "storage_bucket": "songwritter-377b0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:181429275326:android:588fc40ffc5e8352",
+        "android_client_info": {
+          "package_name": "com.songwritter.gaminho.songwritter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "181429275326-c9k5n30k2ea0ikh2d9bupitfc9atsub0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.songwritter.gaminho.songwritter",
+            "certificate_hash": "778fdaacf930245b9a4c40d1f3bc27c6af140e1d"
+          }
+        },
+        {
+          "client_id": "181429275326-nppkfq6fj1n03fep8554h4qogdjf300j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1B5jMJgHPM_f3Tc4PVB-dOcagWUt7B-0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "181429275326-nppkfq6fj1n03fep8554h4qogdjf300j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
