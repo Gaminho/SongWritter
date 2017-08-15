@@ -4,15 +4,14 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
@@ -23,6 +22,8 @@ import java.util.Map;
 
 public class SongActivity extends AppCompatActivity {
 
+    private FirebaseAuth mAuth;
+
     private String UI_MOD;
     private static SongLyrics mSongLyrics;
     public static final String SONG_LYRICS = "lyrics";
@@ -30,12 +31,15 @@ public class SongActivity extends AppCompatActivity {
     //View
     private EditText etContent, etTitle;
 
+
     // Life Cycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
+
+        mAuth = FirebaseAuth.getInstance();
 
         UI_MOD = getIntent().getAction() != null ? getIntent().getAction() : Utils.ACTION_CREATE;
 
@@ -75,24 +79,17 @@ public class SongActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.action_save){
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-//            if(UI_MOD.equals(Utils.ACTION_EDIT)){
-//
-//            }
+            DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
 
             if(UI_MOD.equals(Utils.ACTION_CREATE)) {
-                DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG).push();
-                Log.e("Save", getSongLyrics().toString());
+                ref = ref.push();
                 ref.setValue(getSongLyrics(), new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError != null) {
-                            Log.e("SAVE", databaseError.getMessage());
                             Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getApplication(), getSongLyrics().getTitle()+" has been saved!", Toast.LENGTH_SHORT).show();
-                            Log.e("SAVE", "Data saved successfully.");
                             finish();
                         }
                     }
@@ -100,21 +97,19 @@ public class SongActivity extends AppCompatActivity {
             }
 
             else if (UI_MOD.equals(Utils.ACTION_EDIT)){
-                DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG);
+
                 String key = mSongLyrics.getId();
                 mSongLyrics.setId(null);
                 mSongLyrics.setContent(getSongLyrics().getContent());
                 mSongLyrics.setTitle(getSongLyrics().getTitle());
                 mSongLyrics.setLastUpdate(System.currentTimeMillis());
 
-                Log.e("UPDATE", mSongLyrics.toString());
                 Map<String, Object> childUpdates = new HashMap<>();
                 childUpdates.put(key, mSongLyrics);
                 ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         if (databaseError != null) {
-                            Log.e("UPDATE", databaseError.getMessage());
                             Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                         } else {
                             Toast.makeText(getApplication(), mSongLyrics.getTitle()+" has been updated!", Toast.LENGTH_SHORT).show();
@@ -131,12 +126,11 @@ public class SongActivity extends AppCompatActivity {
             alert.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG).child(mSongLyrics.getId());
+                    DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+                    ref = ref.child(mSongLyrics.getId());
                     ref.removeValue(new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            Log.e("Deletion", mSongLyrics.getId() + " has been removed!");
                             finish();
                         }
                     });
