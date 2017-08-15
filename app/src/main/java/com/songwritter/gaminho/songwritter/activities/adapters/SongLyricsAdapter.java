@@ -56,7 +56,7 @@ public class SongLyricsAdapter extends BaseAdapter {
         ((TextView) row.findViewById(R.id.song_title)).setText(songLyrics.getTitle());
         ((TextView) row.findViewById(R.id.song_preview)).setText(songLyrics.getContent());
         ((TextView)row.findViewById(R.id.creation_song).findViewById(R.id.item_date)).setText(Utils.formatTS(songLyrics.getCreation(), Utils.DateFormat.DAY));
-        ((TextView)row.findViewById(R.id.update_song)).setText("Modif. " + Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.DAY));
+        ((TextView)row.findViewById(R.id.update_song)).setText("Modif. " + Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.FULL));
 
         if(!songLyrics.getAuthor().equals("szdasd"));
             //TODO: add img uri
