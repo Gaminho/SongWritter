@@ -36,22 +36,22 @@ public class SongLyricsAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int i) {
-        return mLyrics.get(i);
+    public Object getItem(int position) {
+        return mLyrics.get(position);
     }
 
     @Override
-    public long getItemId(int i) {
+    public long getItemId(int position) {
         return 0;
     }
 
     @Override
-    public View getView(final int i, View view, ViewGroup viewGroup) {
+    public View getView(final int position, View view, ViewGroup viewGroup) {
 
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View row = inflater.inflate(R.layout.adapter_songslyrics, viewGroup, false);
 
-        final SongLyrics songLyrics = mLyrics.get(i);
+        final SongLyrics songLyrics = mLyrics.get(position);
 
         ((TextView) row.findViewById(R.id.song_title)).setText(songLyrics.getTitle());
         ((TextView) row.findViewById(R.id.song_preview)).setText(songLyrics.getContent());
