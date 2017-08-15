@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.NewText"
+            android:name=".activities.SongActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.MainActivity"

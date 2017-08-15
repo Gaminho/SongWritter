@@ -6,11 +6,29 @@
     android:orientation="vertical"
     tools:context="com.songwritter.gaminho.songwritter.activities.FragmentSongs">
 
-    <TextView
-        android:id="@+id/songs_count"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Vous avez 2 textes" />
+        android:layout_height="30dp"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/songs_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:text="Récupération de vos lyrics" />
+
+        <ProgressBar
+            android:id="@+id/pb_songs"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
+
 
     <ListView
         android:id="@+id/lv_songs"

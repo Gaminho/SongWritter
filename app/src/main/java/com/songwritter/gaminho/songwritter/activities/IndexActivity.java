@@ -105,7 +105,7 @@ public class IndexActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         Log.e("Section", "Current: " +  mCurrentSection);
-        //loadSectionView(mCurrentSection);
+        loadSectionView(mCurrentSection);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class IndexActivity extends AppCompatActivity
         }
 
         else if(id == R.id.action_add_lyrics){
-            startActivity(new Intent(this, NewText.class).setAction(C.ACTION_CREATE));
+            startActivity(new Intent(this, SongActivity.class).setAction(C.ACTION_CREATE));
         }
 
         return super.onOptionsItemSelected(item);

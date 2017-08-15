@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import java.util.List;
 public class FragmentSongs extends Fragment {
 
     List<SongLyrics> mSongs;
+    ProgressBar pbSongs;
 
 
     private static final String ARG_PARAM1 = "param1";
@@ -72,6 +74,9 @@ public class FragmentSongs extends Fragment {
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         final ListView lvSongs = (ListView) view.findViewById(R.id.lv_songs);
         final TextView tvSongs = (TextView) view.findViewById(R.id.songs_count);
+        pbSongs = (ProgressBar) view.findViewById(R.id.pb_songs);
+        pbSongs.setVisibility(View.VISIBLE);
+        tvSongs.setText("Récupération de vos lyrics...");
 
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -83,7 +88,6 @@ public class FragmentSongs extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 Log.e("SONGS", "DATA CHANGE: " + dataSnapshot);
-                tvSongs.setText("Vous avez " + dataSnapshot.getChildrenCount() + " textes");
                 mSongs.clear();
                 for (DataSnapshot songSnapshot: dataSnapshot.getChildren()) {
                     SongLyrics songLyrics = songSnapshot.getValue(SongLyrics.class);
@@ -92,6 +96,8 @@ public class FragmentSongs extends Fragment {
                 }
 
                 lvSongs.setAdapter(new SongLyricsAdapter(getActivity(), mSongs));
+                tvSongs.setText("Vous avez " + dataSnapshot.getChildrenCount() + " textes");
+                pbSongs.setVisibility(View.INVISIBLE);
             }
 
             @Override

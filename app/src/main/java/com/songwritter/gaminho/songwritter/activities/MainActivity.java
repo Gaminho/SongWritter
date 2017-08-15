@@ -9,8 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public void newTxt(View view){
 
         Log.i("onClick", "newTxt");
-        startActivity(new Intent(getApplication(), NewText.class));
+        startActivity(new Intent(getApplication(), SongActivity.class));
     }
 
     public boolean needUpdate(){

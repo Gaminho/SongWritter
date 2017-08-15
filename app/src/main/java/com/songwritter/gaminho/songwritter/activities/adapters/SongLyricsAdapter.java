@@ -8,11 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.songwritter.gaminho.songwritter.C;
 import com.songwritter.gaminho.songwritter.R;
-import com.songwritter.gaminho.songwritter.activities.NewText;
+import com.songwritter.gaminho.songwritter.activities.SongActivity;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
 import java.util.List;
@@ -60,8 +59,8 @@ public class SongLyricsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(NewText.SONG_LYRICS, songLyrics);
-                Intent intent = new Intent(mContext, NewText.class);
+                bundle.putSerializable(SongActivity.SONG_LYRICS, songLyrics);
+                Intent intent = new Intent(mContext, SongActivity.class);
                 intent.setAction(C.ACTION_VIEW);
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);

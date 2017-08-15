@@ -12,14 +12,14 @@
 
         <RelativeLayout
             android:id="@+id/row"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_width="match_parent"
+            android:layout_height="65dp">
 
             <!-- Infos jour -->
             <LinearLayout
                 android:id="@+id/dateLayout"
                 android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:minHeight="50dp"
                 android:background="@color/red500"
                 android:orientation="vertical"
@@ -76,8 +76,9 @@
                 <TextView
                     android:id="@+id/song_preview"
                     android:layout_width="wrap_content"
-                    android:ellipsize="end"
+                    android:ellipsize="marquee"
                     android:layout_height="wrap_content"
+                    android:lines="1"
                     android:text="Rappe la vox Agora tout pour..."
                     android:textSize="16dp"/>
 
