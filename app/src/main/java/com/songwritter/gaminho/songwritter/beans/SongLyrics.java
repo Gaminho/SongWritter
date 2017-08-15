@@ -9,7 +9,32 @@ public class SongLyrics implements Serializable {
     private String title;
     private String content;
     private String author;
+    private long creation;
+    private long lastUpdate;
 
+    public SongLyrics() {
+    }
+
+    public SongLyrics(String title, String content, long lastUpdate) {
+        this.title = title;
+        this.content = content;
+        this.lastUpdate = lastUpdate;
+    }
+
+    public SongLyrics(String title, String content, String author, long lastUpdate) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.lastUpdate = lastUpdate;
+    }
+
+    public SongLyrics(String title, String content, String author, long creation, long lastUpdate) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.creation = creation;
+        this.lastUpdate = lastUpdate;
+    }
 
     public SongLyrics(String title, String content, String author) {
         this.title = title;
@@ -49,6 +74,24 @@ public class SongLyrics implements Serializable {
         this.id = id;
     }
 
+
+
+    public long getCreation() {
+        return creation;
+    }
+
+    public void setCreation(long creation) {
+        this.creation = creation;
+    }
+
+    public long getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(long lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
     @Override
     public String toString() {
         return "SongLyrics{" +
@@ -56,6 +99,9 @@ public class SongLyrics implements Serializable {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", author='" + author + '\'' +
+                ", creation=" + creation +
+                ", lastUpdate=" + lastUpdate +
                 '}';
     }
+
 }

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -65,6 +67,7 @@ public class FragmentGeneral extends Fragment {
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -199,6 +202,13 @@ public class FragmentGeneral extends Fragment {
         });
 
         return view;
+    }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.index, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 }

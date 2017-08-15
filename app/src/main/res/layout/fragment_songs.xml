@@ -1,0 +1,20 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.songwritter.gaminho.songwritter.activities.FragmentSongs">
+
+    <TextView
+        android:id="@+id/songs_count"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vous avez 2 textes" />
+
+    <ListView
+        android:id="@+id/lv_songs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
