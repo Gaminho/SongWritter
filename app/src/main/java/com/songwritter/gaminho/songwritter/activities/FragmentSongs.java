@@ -10,18 +10,17 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.songwritter.gaminho.songwritter.C;
+import com.songwritter.gaminho.songwritter.Database;
+import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.activities.adapters.SongLyricsAdapter;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
@@ -80,7 +79,7 @@ public class FragmentSongs extends Fragment {
 
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(C.DB_TABLE_SONG);
+        DatabaseReference myRef = database.getReference(Database.DB_TABLE_SONG);
 
         // Attach a listener to read the data at our posts reference
         myRef.addValueEventListener(new ValueEventListener() {

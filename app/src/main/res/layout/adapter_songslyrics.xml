@@ -5,82 +5,86 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
-        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp">
+        android:layout_margin="4dp"
+        android:orientation="horizontal">
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/row"
             android:layout_width="match_parent"
-            android:layout_height="65dp">
+            android:layout_height="75dp"
+            android:orientation="horizontal">
 
-            <!-- Infos jour -->
             <LinearLayout
-                android:id="@+id/dateLayout"
-                android:layout_width="50dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:minHeight="50dp"
-                android:background="@color/red500"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:elevation="2dp"
-                android:padding="2dp"
-                android:layout_alignParentLeft="true">
+                android:background="@color/red500">
 
-                <TextView
-                    android:id="@+id/dayLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white0"
-                    android:textSize="12dp"
-                    android:textStyle="bold"
-                    android:text="Ma."/>
-
-                <TextView
-                    android:id="@+id/dayNumber"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white0"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:text="02"/>
-
-                <TextView
-                    android:id="@+id/dayMonth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white0"
-                    android:textSize="12dp"
-                    android:text="Nov."/>
+                <ImageView
+                    android:id="@+id/img_song"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:alpha="0.75"
+                    android:padding="2dp"
+                    android:src="@drawable/img_lyrics" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:layout_toRightOf="@+id/dateLayout"
-                android:layout_centerVertical="true"
                 android:orientation="vertical"
                 android:padding="5dp">
 
-                <TextView
-                    android:id="@+id/song_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Vox Agora"
-                    android:textColor="@color/black0"
-                    android:textSize="18dp"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/song_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@+id/creation_song"
+                        android:text="@string/example_lyrics_title"
+                        android:textColor="@color/black0"
+                        android:lines="1"
+                        android:ellipsize="marquee"
+                        android:textSize="18dp" />
+
+                    <include
+                        android:id="@+id/creation_song"
+                        layout="@layout/date_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/example_lyrics_creation"
+                        android:textColor="@color/black0"
+                        android:textSize="16dp" />
+
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/song_preview"
                     android:layout_width="wrap_content"
-                    android:ellipsize="marquee"
                     android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
                     android:lines="1"
-                    android:text="Rappe la vox Agora tout pour..."
-                    android:textSize="16dp"/>
+                    android:text="@string/example_lyrics_content"
+                    android:textSize="16dp" />
+
+                <TextView
+                    android:id="@+id/update_song"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom"
+                    android:text="Modifié: 15/08/2017"
+                    android:textColor="@color/black0"
+                    android:textSize="12dp" />
 
             </LinearLayout>
 
@@ -92,9 +96,9 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
                 android:src="@drawable/img_lyrics"
-                android:visibility="invisible"/>
+                android:visibility="invisible" />
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </android.support.v7.widget.CardView>
 

@@ -21,4 +21,10 @@
     <string name="nav_friends">Mes contacts</string>
     <string name="nav_msg">Mes messages</string>
 
+
+    <string name="example_lyrics_title">Vox Agora</string>
+    <string name="example_lyrics_content">Noir kawa, à la Néron débute, élevé sur des terres occultes où les démons exultent</string>
+    <string name="example_lyrics_creation">15/08/2017</string>
+    <string name="example_lyrics_update">10h55:42</string>
+
 </resources>

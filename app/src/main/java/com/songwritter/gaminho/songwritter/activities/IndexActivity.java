@@ -25,7 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.songwritter.gaminho.songwritter.C;
+import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
 
 public class IndexActivity extends AppCompatActivity
@@ -167,7 +167,7 @@ public class IndexActivity extends AppCompatActivity
         }
 
         else if(id == R.id.action_add_lyrics){
-            startActivity(new Intent(this, SongActivity.class).setAction(C.ACTION_CREATE));
+            startActivity(new Intent(this, SongActivity.class).setAction(Utils.ACTION_CREATE));
         }
 
         return super.onOptionsItemSelected(item);

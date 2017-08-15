@@ -7,9 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.songwritter.gaminho.songwritter.C;
+import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.activities.SongActivity;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
@@ -54,6 +55,13 @@ public class SongLyricsAdapter extends BaseAdapter {
 
         ((TextView) row.findViewById(R.id.song_title)).setText(songLyrics.getTitle());
         ((TextView) row.findViewById(R.id.song_preview)).setText(songLyrics.getContent());
+        ((TextView)row.findViewById(R.id.creation_song).findViewById(R.id.item_date)).setText(Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.DAY));
+        ((TextView)row.findViewById(R.id.update_song)).setText("Modif. " + Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.DAY));
+
+        if(!songLyrics.getAuthor().equals("szdasd"));
+            //TODO: add img uri
+        else
+            ((ImageView)row.findViewById(R.id.img_song)).setImageDrawable(mContext.getDrawable(R.drawable.img_lyrics));
 
         row.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +69,7 @@ public class SongLyricsAdapter extends BaseAdapter {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(SongActivity.SONG_LYRICS, songLyrics);
                 Intent intent = new Intent(mContext, SongActivity.class);
-                intent.setAction(C.ACTION_VIEW);
+                intent.setAction(Utils.ACTION_VIEW);
                 intent.putExtras(bundle);
                 mContext.startActivity(intent);
             }

@@ -13,7 +13,8 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.songwritter.gaminho.songwritter.C;
+import com.songwritter.gaminho.songwritter.Database;
+import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
@@ -36,9 +37,9 @@ public class SongActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song);
 
-        UI_MOD = getIntent().getAction() != null ? getIntent().getAction() : C.ACTION_CREATE;
+        UI_MOD = getIntent().getAction() != null ? getIntent().getAction() : Utils.ACTION_CREATE;
 
-        if(!UI_MOD.equals(C.ACTION_CREATE) && getIntent().getExtras() != null) {
+        if(!UI_MOD.equals(Utils.ACTION_CREATE) && getIntent().getExtras() != null) {
             mSongLyrics = (SongLyrics) getIntent().getExtras().getSerializable(SONG_LYRICS);
         }
 
@@ -56,7 +57,7 @@ public class SongActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        if(UI_MOD.equals(C.ACTION_VIEW)){
+        if(UI_MOD.equals(Utils.ACTION_VIEW)){
             menu.findItem(R.id.action_delete).setVisible(true);
             menu.findItem(R.id.action_save).setVisible(false);
             menu.findItem(R.id.action_edit).setVisible(true);
@@ -76,12 +77,12 @@ public class SongActivity extends AppCompatActivity {
         if(id == R.id.action_save){
             FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-//            if(UI_MOD.equals(C.ACTION_EDIT)){
+//            if(UI_MOD.equals(Utils.ACTION_EDIT)){
 //
 //            }
 
-            if(UI_MOD.equals(C.ACTION_CREATE)) {
-                DatabaseReference ref = database.getReference(C.DB_TABLE_SONG).push();
+            if(UI_MOD.equals(Utils.ACTION_CREATE)) {
+                DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG).push();
                 Log.e("Save", getSongLyrics().toString());
                 ref.setValue(getSongLyrics(), new DatabaseReference.CompletionListener() {
                     @Override
@@ -98,8 +99,8 @@ public class SongActivity extends AppCompatActivity {
                 });
             }
 
-            else if (UI_MOD.equals(C.ACTION_EDIT)){
-                DatabaseReference ref = database.getReference(C.DB_TABLE_SONG);
+            else if (UI_MOD.equals(Utils.ACTION_EDIT)){
+                DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG);
                 String key = mSongLyrics.getId();
                 mSongLyrics.setId(null);
                 mSongLyrics.setContent(getSongLyrics().getContent());
@@ -131,7 +132,7 @@ public class SongActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference ref = database.getReference(C.DB_TABLE_SONG).child(mSongLyrics.getId());
+                    DatabaseReference ref = database.getReference(Database.DB_TABLE_SONG).child(mSongLyrics.getId());
                     ref.removeValue(new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
@@ -154,7 +155,7 @@ public class SongActivity extends AppCompatActivity {
         }
 
         else if (id == R.id.action_edit){
-            UI_MOD = C.ACTION_EDIT;
+            UI_MOD = Utils.ACTION_EDIT;
             invalidateOptionsMenu();
             handleMod(UI_MOD);
         }
@@ -164,7 +165,7 @@ public class SongActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(!UI_MOD.equals(C.ACTION_EDIT)) {
+        if(!UI_MOD.equals(Utils.ACTION_EDIT)) {
             super.onBackPressed();
         }
 
@@ -206,7 +207,7 @@ public class SongActivity extends AppCompatActivity {
         EditText edTitle = (EditText) findViewById(R.id.etTitle);
         EditText edContent = (EditText) findViewById(R.id.etContent);
 
-        if(mod.equals(C.ACTION_VIEW)){
+        if(mod.equals(Utils.ACTION_VIEW)){
             edTitle.setEnabled(false);
             edContent.setEnabled(false);
         }
@@ -215,7 +216,7 @@ public class SongActivity extends AppCompatActivity {
             edContent.setEnabled(true);
         }
 
-        if(!mod.equals(C.ACTION_CREATE) && mSongLyrics != null){
+        if(!mod.equals(Utils.ACTION_CREATE) && mSongLyrics != null){
             edTitle.setText(mSongLyrics.getTitle());
             edContent.setText(mSongLyrics.getContent());
         }

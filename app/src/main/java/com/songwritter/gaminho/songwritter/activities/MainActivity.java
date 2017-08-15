@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void save(View view){
-        Toast.makeText(this,"C'est cool Raoul!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"Utils'est cool Raoul!", Toast.LENGTH_SHORT).show();
         mList.add("New Project");
 
         Log.i("onClick", "save");

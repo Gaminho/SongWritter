@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:layout_height="50dp">
+
+
+    <ImageView
+        android:layout_width="15dp"
+        android:layout_height="10dp"
+        android:src="@drawable/ic_schedule_white_48dp"
+        android:tint="@color/grey"/>
+
+    <TextView
+        android:id="@+id/item_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/example_lyrics_creation"/>
+
+</LinearLayout>

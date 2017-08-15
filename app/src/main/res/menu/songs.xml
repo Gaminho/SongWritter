@@ -4,20 +4,16 @@
 
     <item
         android:id="@+id/action_save"
-        android:icon="@drawable/ic_save_white_48dp"
         android:title="Enregistrer"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/action_delete"
-        android:icon="@drawable/ic_delete_white_48dp"
         android:title="Supprimer"
         app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/action_edit"
-        android:icon="@drawable/ic_create_white_48dp"
         android:title="Modifier"
         app:showAsAction="ifRoom"/>
-
 </menu>
