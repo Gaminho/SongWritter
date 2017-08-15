@@ -15,6 +15,7 @@
     <string name="action_add_lyrics">Ajouter</string>
 
     <string name="nav_grl">Vue d\'ensemble</string>
+    <string name="nav_profile">Mon profil</string>
     <string name="nav_texts">Mes textes</string>
     <string name="nav_projects">Mes projets</string>
     <string name="nav_settings">Mes options</string>

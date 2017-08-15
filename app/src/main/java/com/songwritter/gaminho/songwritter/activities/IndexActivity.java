@@ -30,16 +30,19 @@ import com.songwritter.gaminho.songwritter.R;
 
 public class IndexActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        FragmentSongs.OnFragmentInteractionListener {
+        FragmentSongs.OnFragmentInteractionListener,
+        FragmentProfile.OnProfileInteractionListener,
+        FirebaseAuth.AuthStateListener {
 
 
     //Sections
     private static final int SECTION_GNRL = 0;
-    private static final int SECTION_LYRICS = 1;
-    private static final int SECTION_PROJECTS = 2;
-    private static final int SECTION_SETTINGS = 3;
-    private static final int SECTION_CONTACTS = 4;
-    private static final int SECTION_MSG = 5;
+    private static final int SECTION_PROFILE = 1;
+    private static final int SECTION_LYRICS = 2;
+    private static final int SECTION_PROJECTS = 3;
+    private static final int SECTION_SETTINGS = 4;
+    private static final int SECTION_CONTACTS = 5;
+    private static final int SECTION_MSG = 6;
 
     //Views
     private NavigationView navigationView;
@@ -63,42 +66,13 @@ public class IndexActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    updateHeaderView(R.layout.drawer_header_connected, "Connecté en tant que " + user.getDisplayName());
-
-//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                            .setDisplayName("Gaminho")
-//                            .setPhotoUri(Uri.parse("findicons.com/files/icons/1072/face_avatars/300/a04.png"))
-//                            .build();
-//
-//                    user.updateProfile(profileUpdates)
-//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful()) {
-//                                        Log.e("Update", "User profile updated.");
-//                                    }
-//                                }
-//                            });
-
-
-
-                } else {
-                    updateHeaderView(R.layout.drawer_header_not_connected, "Non connecté");
-                }
-            }
-        };
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         loadSectionView(mCurrentSection);
-        mAuth.addAuthStateListener(mAuthListener);
+        mAuth.addAuthStateListener(this);
     }
 
     @Override
@@ -131,6 +105,9 @@ public class IndexActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id){
+            case R.id.nav_profile:
+                id = SECTION_PROFILE;
+                break;
             case R.id.nav_grl:
                 id = SECTION_GNRL;
                 break;
@@ -174,7 +151,6 @@ public class IndexActivity extends AppCompatActivity
     }
 
 
-
     // Managing UI
 
     private void loadSectionView(int position) {
@@ -191,6 +167,10 @@ public class IndexActivity extends AppCompatActivity
                 fragment = FragmentSongs.newInstance();
                 label = getString(R.string.nav_texts);
                 break;
+            case SECTION_PROFILE:
+                fragment = FragmentProfile.newInstance();
+                label = getString(R.string.nav_profile);
+                break;
             case SECTION_PROJECTS:
                 label = getString(R.string.nav_projects);
                 break;
@@ -205,7 +185,7 @@ public class IndexActivity extends AppCompatActivity
                 break;
         }
 
-        if(position > SECTION_LYRICS) {
+        if(position != SECTION_LYRICS && position != SECTION_GNRL && position != SECTION_PROFILE) {
             Toast.makeText(getApplicationContext(), "'" + label + "' n'est pas disponible !", Toast.LENGTH_SHORT).show();
             mCurrentSection = SECTION_GNRL;
         }
@@ -233,26 +213,48 @@ public class IndexActivity extends AppCompatActivity
         }
     }
 
-    private void updateHeaderView(int layout, String headerText) {
-        navigationView.removeHeaderView(navigationView.getHeaderView(0));
-        LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(layout, null, false);
-        ((TextView) view.findViewById(R.id.connectedAs)).setText(headerText);
+    private void updateHeaderView(final boolean connected) {
+        ImageView signPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.sign_pix);
+        ImageView usrPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.user_pix);
+        TextView headerMsg = (TextView) navigationView.getHeaderView(0).findViewById(R.id.connectedAs);
 
-        FirebaseUser user = mAuth.getCurrentUser();
+        usrPix.setImageDrawable(getDrawable(R.drawable.android));
 
-        if(user != null){
-            Log.e("USER", user.toString());
-            ((ImageView) view.findViewById(R.id.userPix)).setImageURI(user.getPhotoUrl());
-            ((TextView) view.findViewById(R.id.connectedAs)).setText("Connecté en tant que " + user.getDisplayName());
+        if(connected){
+            FirebaseUser user = mAuth.getCurrentUser();
+            signPix.setImageDrawable(getDrawable(R.drawable.signout));
+            //TODO: update img view
+            if(user.getDisplayName() != null)
+                headerMsg.setText("Connecté en tant que " + user.getDisplayName());
+            else
+                headerMsg.setText("Connecté");
+
+            navigationView.getMenu().getItem(SECTION_PROFILE).setVisible(true);
+            navigationView.getMenu().getItem(SECTION_LYRICS).setVisible(true);
+            navigationView.getMenu().getItem(SECTION_PROJECTS).setVisible(true);
+            navigationView.getMenu().getItem(SECTION_SETTINGS).setVisible(true);
+            navigationView.getMenu().getItem(SECTION_CONTACTS).setVisible(true);
+            navigationView.getMenu().getItem(SECTION_MSG).setVisible(true);
+        }
+        else{
+            headerMsg.setText("Non connecté");
+            signPix.setImageDrawable(getDrawable(R.drawable.signin));
+            navigationView.getMenu().getItem(SECTION_PROFILE).setVisible(false);
+            navigationView.getMenu().getItem(SECTION_LYRICS).setVisible(false);
+            navigationView.getMenu().getItem(SECTION_PROJECTS).setVisible(false);
+            navigationView.getMenu().getItem(SECTION_SETTINGS).setVisible(false);
+            navigationView.getMenu().getItem(SECTION_CONTACTS).setVisible(false);
+            navigationView.getMenu().getItem(SECTION_MSG).setVisible(false);
         }
 
-
-
-        if(layout == R.layout.drawer_header_not_connected) {
-            view.findViewById(R.id.signin).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        navigationView.getHeaderView(0).findViewById(R.id.sign_out).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(connected) {
+                    Log.e("Click", "SignOut");
+                    mAuth.signOut();
+                }
+                else{
                     Log.e("Click", "SignIn");
                     mAuth.signInWithEmailAndPassword("goldenglawi@gmail.com", "Rhomer91")
                             .addOnCompleteListener(IndexActivity.this, new OnCompleteListener<AuthResult>() {
@@ -267,23 +269,51 @@ public class IndexActivity extends AppCompatActivity
                                 }
                             });
                 }
-            });
-        }
-        else{
-            view.findViewById(R.id.sign_out).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.e("Click", "SignOut");
-                    mAuth.signOut();
-                }
-            });
-        }
-
-        navigationView.addHeaderView(view);
+            }
+        });
     }
 
     @Override
     public void onFragmentInteraction(Uri uri) {
         Log.e("ntd", "Nothing to do!");
+    }
+
+    @Override
+    public FirebaseUser getUser() {
+        if (mAuth == null)
+            return null;
+        else
+            return mAuth.getCurrentUser();
+    }
+
+    @Override
+    public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if (user != null) {
+            updateHeaderView(true);
+            //                   updateHeaderView(R.layout.drawer_header, "Connecté en tant que " + user.getDisplayName());
+
+//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+//                            .setDisplayName("Gaminho")
+//                            .setPhotoUri(Uri.parse("findicons.com/files/icons/1072/face_avatars/300/a04.png"))
+//                            .build();
+//
+//                    user.updateProfile(profileUpdates)
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    if (task.isSuccessful()) {
+//                                        Log.e("Update", "User profile updated.");
+//                                    }
+//                                }
+//                            });
+
+
+
+        } else {
+            updateHeaderView(false);
+//                    updateHeaderView(R.layout.drawer_header, "Non connecté");
+        }
     }
 }

@@ -190,7 +190,7 @@ public class SongActivity extends AppCompatActivity {
 
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
-        String author = "me";
+        String author = mAuth.getCurrentUser().getDisplayName();
         long creation = System.currentTimeMillis();
         long lastUpdate = System.currentTimeMillis();
         return new SongLyrics(title, content, author, creation, lastUpdate);

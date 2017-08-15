@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/nav_grl" />
         <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/nav_profile" />
+        <item
             android:id="@+id/nav_text"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/nav_texts" />
