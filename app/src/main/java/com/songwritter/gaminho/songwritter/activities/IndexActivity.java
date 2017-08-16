@@ -401,6 +401,7 @@ public class IndexActivity extends AppCompatActivity
         String prefMail = mSharedPreferences.getString(Utils.PREF_USER_MAIL, "");
 
         if(!prefMail.isEmpty()) {
+            ((CheckBox) view.findViewById(R.id.user_remind)).setChecked(true);
             etUsrMail.setText(prefMail);
             bLogIn.setEnabled(true);
         }
@@ -488,7 +489,7 @@ public class IndexActivity extends AppCompatActivity
                             public void onComplete(@NonNull Task<AuthResult> task) {
 
                                 if(task.isSuccessful()){
-                                    saveUserCredentials(dialog,userMail,userPass);
+                                    saveUserCredentials((CheckBox) dialog.findViewById(R.id.user_remind),userMail,userPass);
                                     dialog.dismiss();
                                 }
                                 else{
@@ -504,7 +505,7 @@ public class IndexActivity extends AppCompatActivity
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    saveUserCredentials(dialog,userMail,userPass);
+                                    saveUserCredentials((CheckBox) dialog.findViewById(R.id.user_remind), userMail, userPass);
                                     dialog.dismiss();
                                 }
                                 else{
@@ -525,10 +526,12 @@ public class IndexActivity extends AppCompatActivity
         dialog.findViewById(R.id.cancel).setEnabled(visibility != View.VISIBLE);
     }
 
-    private void saveUserCredentials(AlertDialog dialog, String userMail, String userPass){
-        CheckBox remindUsr = (CheckBox) dialog.findViewById(R.id.user_remind);
+    private void saveUserCredentials(CheckBox remindUsr, String userMail, String userPass){
         if(remindUsr.isChecked()){
             mSharedPreferences.edit().putString(Utils.PREF_USER_MAIL, userMail).putString(Utils.PREF_USER_PASS, userPass).apply();
+        }
+        else{
+            mSharedPreferences.edit().putString(Utils.PREF_USER_MAIL, "").putString(Utils.PREF_USER_PASS, "").apply();
         }
     }
 
