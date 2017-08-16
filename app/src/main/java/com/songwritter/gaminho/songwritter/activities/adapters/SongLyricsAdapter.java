@@ -2,6 +2,7 @@ package com.songwritter.gaminho.songwritter.activities.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.songwritter.gaminho.songwritter.activities.SongActivity;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
 import java.util.List;
+import java.util.Locale;
 
 
 public class SongLyricsAdapter extends BaseAdapter {
@@ -52,16 +54,19 @@ public class SongLyricsAdapter extends BaseAdapter {
         View row = inflater.inflate(R.layout.adapter_songslyrics, viewGroup, false);
 
         final SongLyrics songLyrics = mLyrics.get(position);
+        Drawable imgDrawable;
 
         ((TextView) row.findViewById(R.id.song_title)).setText(songLyrics.getTitle());
         ((TextView) row.findViewById(R.id.song_preview)).setText(songLyrics.getContent());
         ((TextView)row.findViewById(R.id.creation_song).findViewById(R.id.item_date)).setText(Utils.formatTS(songLyrics.getCreation(), Utils.DateFormat.DAY));
-        ((TextView)row.findViewById(R.id.update_song)).setText("Modif. " + Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.FULL));
+        ((TextView)row.findViewById(R.id.update_song)).setText(String.format(Locale.FRANCE, mContext.getString(R.string.format_last_update), Utils.formatTS(songLyrics.getLastUpdate(), Utils.DateFormat.FULL)));
 
-        if(!songLyrics.getAuthor().equals("szdasd"));
-            //TODO: add img uri
+        if(songLyrics.getAuthor().equals("szdasd"))
+            imgDrawable = null;
         else
-            ((ImageView)row.findViewById(R.id.img_song)).setImageDrawable(mContext.getDrawable(R.drawable.img_lyrics));
+            imgDrawable = mContext.getDrawable(R.drawable.img_lyrics);
+
+        ((ImageView)row.findViewById(R.id.img_song)).setImageDrawable(imgDrawable);
 
         row.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -68,9 +68,6 @@ public class IndexActivity extends AppCompatActivity
     private int mCurrentSection;
 
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -241,7 +238,7 @@ public class IndexActivity extends AppCompatActivity
             cardViewPix = getDrawable(R.drawable.signout);
             //TODO: update img view
             if (user.getDisplayName() != null)
-                headerMsg.setText(String.format(Locale.FRANCE, getString(R.string.state_connected_as), user.getDisplayName()));
+                headerMsg.setText(String.format(Locale.FRANCE, getString(R.string.format_connected_as), user.getDisplayName()));
             else
                 headerMsg.setText(getString(R.string.state_connected));
 

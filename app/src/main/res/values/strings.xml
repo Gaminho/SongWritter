@@ -40,9 +40,12 @@
     <string name="btn_log_in">Log in</string>
     <string name="btn_sign_in">Sign in</string>
 
-    <!-- Button -->
+    <!-- Connect states -->
     <string name="state_connected">Connecté</string>
-    <string name="state_connected_as">Connecté en tant que %s</string>
     <string name="state_not_connected">Non connecté</string>
+
+    <!-- Formats -->
+    <string name="format_connected_as">Connecté en tant que %s</string>
+    <string name="format_last_update">"Modif. %s</string>
 
 </resources>
