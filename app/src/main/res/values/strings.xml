@@ -28,4 +28,16 @@
     <string name="example_lyrics_creation">15/08/2017</string>
     <string name="example_lyrics_update">10h55:42</string>
 
+    <!-- Hints -->
+    <string name="hint_mail">Adresse mail</string>
+    <string name="hint_pass">Mot de passe</string>
+    <string name="remind_credentials">Enregistrer mes identifiants</string>
+    <string name="no_account">Créer un compte</string>
+
+
+    <!-- Button -->
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_log_in">Log in</string>
+    <string name="btn_sign_in">Sign in</string>
+
 </resources>

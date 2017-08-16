@@ -2,7 +2,10 @@ package com.songwritter.gaminho.songwritter.activities;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,12 +13,19 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +59,9 @@ public class IndexActivity extends AppCompatActivity
 
     //Authentication
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
+
+    //Preferences
+    private SharedPreferences mSharedPreferences;
 
 
     // Instance
@@ -66,6 +78,8 @@ public class IndexActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mAuth = FirebaseAuth.getInstance();
+
+        mSharedPreferences = getSharedPreferences(Utils.DEFAULT_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -85,9 +99,7 @@ public class IndexActivity extends AppCompatActivity
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
+        mAuth.removeAuthStateListener(this);
     }
 
     @Override
@@ -217,61 +229,94 @@ public class IndexActivity extends AppCompatActivity
         ImageView signPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.sign_pix);
         ImageView usrPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.user_pix);
         TextView headerMsg = (TextView) navigationView.getHeaderView(0).findViewById(R.id.connectedAs);
-
+        int cardViewColor;
+        Drawable cardViewPix;
         usrPix.setImageDrawable(getDrawable(R.drawable.android));
 
-        if(connected){
+        if (connected) {
             FirebaseUser user = mAuth.getCurrentUser();
-            signPix.setImageDrawable(getDrawable(R.drawable.signout));
+            cardViewColor = getColor(R.color.red500);
+            cardViewPix = getDrawable(R.drawable.signout);
             //TODO: update img view
-            if(user.getDisplayName() != null)
+            if (user.getDisplayName() != null)
                 headerMsg.setText("Connecté en tant que " + user.getDisplayName());
             else
                 headerMsg.setText("Connecté");
 
-            navigationView.getMenu().getItem(SECTION_PROFILE).setVisible(true);
-            navigationView.getMenu().getItem(SECTION_LYRICS).setVisible(true);
-            navigationView.getMenu().getItem(SECTION_PROJECTS).setVisible(true);
-            navigationView.getMenu().getItem(SECTION_SETTINGS).setVisible(true);
-            navigationView.getMenu().getItem(SECTION_CONTACTS).setVisible(true);
-            navigationView.getMenu().getItem(SECTION_MSG).setVisible(true);
-        }
-        else{
+        } else {
             headerMsg.setText("Non connecté");
-            signPix.setImageDrawable(getDrawable(R.drawable.signin));
-            navigationView.getMenu().getItem(SECTION_PROFILE).setVisible(false);
-            navigationView.getMenu().getItem(SECTION_LYRICS).setVisible(false);
-            navigationView.getMenu().getItem(SECTION_PROJECTS).setVisible(false);
-            navigationView.getMenu().getItem(SECTION_SETTINGS).setVisible(false);
-            navigationView.getMenu().getItem(SECTION_CONTACTS).setVisible(false);
-            navigationView.getMenu().getItem(SECTION_MSG).setVisible(false);
+            cardViewColor = getColor(R.color.green500);
+            cardViewPix = getDrawable(R.drawable.signin);
         }
+
+        // Handle Menu Sections
+        for (int i = SECTION_PROFILE; i < navigationView.getMenu().size(); i++){
+            navigationView.getMenu().getItem(i).setVisible(connected);
+        }
+
+        // CardView
+        ((CardView) navigationView.getHeaderView(0).findViewById(R.id.sign_out)).setCardBackgroundColor(cardViewColor);
+        signPix.setImageDrawable(cardViewPix);
 
         navigationView.getHeaderView(0).findViewById(R.id.sign_out).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(connected) {
-                    Log.e("Click", "SignOut");
+                //User is connected
+                if (connected) {
                     mAuth.signOut();
                 }
-                else{
-                    Log.e("Click", "SignIn");
-                    mAuth.signInWithEmailAndPassword("goldenglawi@gmail.com", "Rhomer91")
-                            .addOnCompleteListener(IndexActivity.this, new OnCompleteListener<AuthResult>() {
+
+                // User is not connected
+                else {
+
+                    final AlertDialog dialog = connectionDialog("Authentication").show();
+
+                    dialog.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    dialog.findViewById(R.id.create_account).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog.dismiss();
+
+                            final AlertDialog dialog = creationDialog("Sign in", "2").show();
+
+                            dialog.findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    Log.e("Click", "signInWithEmail:onComplete:" + task.isSuccessful());
+                                public void onClick(View view) {
 
-                                    if (!task.isSuccessful()) {
-                                        Log.e("Click", "signInWithEmail:failed", task.getException());
-                                    }
-
+                                    final String userMail = ((EditText) dialog.findViewById(R.id.user_mail)).getText().toString().trim();
+                                    final String userPass = ((EditText) dialog.findViewById(R.id.user_pass)).getText().toString();
+                                    handleFirebaseAction(FirebaseAction.SIGN_IN, dialog, userMail, userPass);
                                 }
                             });
+
+                            dialog.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
+                    });
+
+                    dialog.findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            final String userMail = ((EditText) dialog.findViewById(R.id.user_mail)).getText().toString().trim();
+                            final String userPass = ((EditText) dialog.findViewById(R.id.user_pass)).getText().toString();
+                            handleFirebaseAction(FirebaseAction.LOG_IN, dialog, userMail, userPass);
+                        }
+                    });
                 }
             }
         });
     }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {
@@ -316,4 +361,178 @@ public class IndexActivity extends AppCompatActivity
 //                    updateHeaderView(R.layout.drawer_header, "Non connecté");
         }
     }
+
+
+    private AlertDialog.Builder connectionDialog(String title){
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(title);
+
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflater.inflate(R.layout.dialog_connection, null, false);
+        alert.setView(view);
+
+        final EditText etUsrMail = (EditText) view.findViewById(R.id.user_mail);
+        final EditText etUsrPass = (EditText) view.findViewById(R.id.user_pass);
+        final Button bLogIn = (Button) view.findViewById(R.id.login);
+
+        TextWatcher etWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(etUsrMail.getText().length() == 0 || etUsrPass.getText().length() == 0){
+                    bLogIn.setEnabled(false);
+                }
+                else{
+                    bLogIn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        };
+
+        etUsrMail.addTextChangedListener(etWatcher);
+        etUsrPass.addTextChangedListener(etWatcher);
+
+        String prefMail = mSharedPreferences.getString(Utils.PREF_USER_MAIL, "");
+
+        if(!prefMail.isEmpty()) {
+            etUsrMail.setText(prefMail);
+            bLogIn.setEnabled(true);
+        }
+
+        String prefPass = mSharedPreferences.getString(Utils.PREF_USER_PASS, "");
+
+        if(!prefPass.isEmpty()) {
+            etUsrPass.setText(prefPass);
+            bLogIn.setEnabled(true);
+        }
+
+        return alert;
+    }
+
+    private AlertDialog.Builder creationDialog(String title, String mod){
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(title);
+
+        LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View view = inflater.inflate(R.layout.dialog_connection, null, false);
+        alert.setView(view);
+
+        final EditText etUsrMail = (EditText) view.findViewById(R.id.user_mail);
+        final EditText etUsrPass = (EditText) view.findViewById(R.id.user_pass);
+        final Button bLogIn = (Button) view.findViewById(R.id.login);
+
+        TextWatcher etWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(etUsrMail.getText().length() == 0 || etUsrPass.getText().length() == 0){
+                    bLogIn.setEnabled(false);
+                }
+                else{
+                    bLogIn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        };
+
+        etUsrMail.addTextChangedListener(etWatcher);
+        etUsrPass.addTextChangedListener(etWatcher);
+
+        if(mod.equals("0")) {
+            view.findViewById(R.id.create_account).setVisibility(View.VISIBLE);
+
+            String prefMail = mSharedPreferences.getString(Utils.PREF_USER_MAIL, "");
+            bLogIn.setText(getText(R.string.btn_log_in));
+            if (!prefMail.isEmpty()) {
+                etUsrMail.setText(prefMail);
+                bLogIn.setEnabled(true);
+            }
+
+            String prefPass = mSharedPreferences.getString(Utils.PREF_USER_PASS, "");
+
+            if (!prefPass.isEmpty()) {
+                etUsrPass.setText(prefPass);
+                bLogIn.setEnabled(true);
+            }
+        }
+        else{
+            view.findViewById(R.id.create_account).setVisibility(View.GONE);
+            bLogIn.setText(getText(R.string.btn_sign_in));
+        }
+
+        return alert;
+    }
+
+    enum FirebaseAction {
+        SIGN_IN, LOG_IN
+    }
+
+    private void handleFirebaseAction(FirebaseAction action, final AlertDialog dialog, final String userMail, final String userPass){
+
+        switch(action){
+            case LOG_IN:
+                handleProgress(dialog, View.VISIBLE);
+                mAuth.signInWithEmailAndPassword(userMail, userPass)
+                        .addOnCompleteListener(IndexActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                if(task.isSuccessful()){
+                                    saveUserCredentials(dialog,userMail,userPass);
+                                    dialog.dismiss();
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                return;
+            case SIGN_IN:
+                handleProgress(dialog, View.VISIBLE);
+                mAuth.createUserWithEmailAndPassword(userMail, userPass)
+                        .addOnCompleteListener(IndexActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if(task.isSuccessful()){
+                                    saveUserCredentials(dialog,userMail,userPass);
+                                    dialog.dismiss();
+                                }
+                                else{
+                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+
+                                handleProgress(dialog, View.INVISIBLE);
+                                updateHeaderView(task.isSuccessful());
+                            }
+                        });
+                return;
+        }
+    }
+
+    private void handleProgress(AlertDialog dialog, int visibility){
+        dialog.findViewById(R.id.pb_connection).setVisibility(visibility);
+        dialog.findViewById(R.id.login).setEnabled(visibility != View.VISIBLE);
+        dialog.findViewById(R.id.cancel).setEnabled(visibility != View.VISIBLE);
+        return;
+    }
+
+    private void saveUserCredentials(AlertDialog dialog, String userMail, String userPass){
+        CheckBox remindUsr = (CheckBox) dialog.findViewById(R.id.user_remind);
+        if(remindUsr.isChecked()){
+            mSharedPreferences.edit().putString(Utils.PREF_USER_MAIL, userMail).putString(Utils.PREF_USER_PASS, userPass).apply();
+        }
+    }
+
 }

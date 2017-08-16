@@ -7,6 +7,10 @@ public class Utils {
 
     public static String URL_YOUTUBE_MP3 = "http://www.youtubeinmp3.com"; // /download/get/?i=kG9rhGAdR3OxG9Sz3Y8aBmJ1CqSc0gk6&e=73&v=mm8S1lwzrGA"
 
+    //SharedPreferences
+    public static final String DEFAULT_PREFERENCES = "SongWritter";
+    public static final String PREF_USER_MAIL = "user_mail";
+    public static final String PREF_USER_PASS = "user_pass";
 
     public static final String ACTION_VIEW = "view";
     public static final String ACTION_EDIT = "edit";
