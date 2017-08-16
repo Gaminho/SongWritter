@@ -16,6 +16,10 @@ public class Utils {
     public static final String ACTION_EDIT = "edit";
     public static final String ACTION_CREATE = "create";
 
+    public enum FirebaseAction {
+        SIGN_IN, LOG_IN
+    }
+
     public enum DateFormat {
         FULL, DAY, HOUR
     }

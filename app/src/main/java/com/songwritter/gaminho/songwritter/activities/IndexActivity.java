@@ -35,15 +35,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
+import com.songwritter.gaminho.songwritter.Utils;
+
+import java.util.Locale;
 
 public class IndexActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         FragmentSongs.OnFragmentInteractionListener,
         FragmentProfile.OnProfileInteractionListener,
         FirebaseAuth.AuthStateListener {
-
 
     //Sections
     private static final int SECTION_GNRL = 0;
@@ -63,9 +64,12 @@ public class IndexActivity extends AppCompatActivity
     //Preferences
     private SharedPreferences mSharedPreferences;
 
-
     // Instance
     private int mCurrentSection;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +116,8 @@ public class IndexActivity extends AppCompatActivity
         }
     }
 
-
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id){
             case R.id.nav_profile:
@@ -145,7 +148,6 @@ public class IndexActivity extends AppCompatActivity
 
         return false;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -239,12 +241,12 @@ public class IndexActivity extends AppCompatActivity
             cardViewPix = getDrawable(R.drawable.signout);
             //TODO: update img view
             if (user.getDisplayName() != null)
-                headerMsg.setText("Connecté en tant que " + user.getDisplayName());
+                headerMsg.setText(String.format(Locale.FRANCE, getString(R.string.state_connected_as), user.getDisplayName()));
             else
-                headerMsg.setText("Connecté");
+                headerMsg.setText(getString(R.string.state_connected));
 
         } else {
-            headerMsg.setText("Non connecté");
+            headerMsg.setText(getString(R.string.state_not_connected));
             cardViewColor = getColor(R.color.green500);
             cardViewPix = getDrawable(R.drawable.signin);
         }
@@ -288,10 +290,9 @@ public class IndexActivity extends AppCompatActivity
                             dialog.findViewById(R.id.login).setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-
                                     final String userMail = ((EditText) dialog.findViewById(R.id.user_mail)).getText().toString().trim();
                                     final String userPass = ((EditText) dialog.findViewById(R.id.user_pass)).getText().toString();
-                                    handleFirebaseAction(FirebaseAction.SIGN_IN, dialog, userMail, userPass);
+                                    handleFirebaseAction(Utils.FirebaseAction.SIGN_IN, dialog, userMail, userPass);
                                 }
                             });
 
@@ -309,7 +310,7 @@ public class IndexActivity extends AppCompatActivity
                         public void onClick(View view) {
                             final String userMail = ((EditText) dialog.findViewById(R.id.user_mail)).getText().toString().trim();
                             final String userPass = ((EditText) dialog.findViewById(R.id.user_pass)).getText().toString();
-                            handleFirebaseAction(FirebaseAction.LOG_IN, dialog, userMail, userPass);
+                            handleFirebaseAction(Utils.FirebaseAction.LOG_IN, dialog, userMail, userPass);
                         }
                     });
                 }
@@ -317,6 +318,7 @@ public class IndexActivity extends AppCompatActivity
         });
     }
 
+    // Interface
 
     @Override
     public void onFragmentInteraction(Uri uri) {
@@ -362,6 +364,7 @@ public class IndexActivity extends AppCompatActivity
         }
     }
 
+    // Dialog
 
     private AlertDialog.Builder connectionDialog(String title){
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -475,11 +478,9 @@ public class IndexActivity extends AppCompatActivity
         return alert;
     }
 
-    enum FirebaseAction {
-        SIGN_IN, LOG_IN
-    }
+    // Utils
 
-    private void handleFirebaseAction(FirebaseAction action, final AlertDialog dialog, final String userMail, final String userPass){
+    private void handleFirebaseAction(Utils.FirebaseAction action, final AlertDialog dialog, final String userMail, final String userPass){
 
         switch(action){
             case LOG_IN:
@@ -498,7 +499,7 @@ public class IndexActivity extends AppCompatActivity
                                 }
                             }
                         });
-                return;
+                break;
             case SIGN_IN:
                 handleProgress(dialog, View.VISIBLE);
                 mAuth.createUserWithEmailAndPassword(userMail, userPass)
@@ -517,7 +518,7 @@ public class IndexActivity extends AppCompatActivity
                                 updateHeaderView(task.isSuccessful());
                             }
                         });
-                return;
+                break;
         }
     }
 
@@ -525,7 +526,6 @@ public class IndexActivity extends AppCompatActivity
         dialog.findViewById(R.id.pb_connection).setVisibility(visibility);
         dialog.findViewById(R.id.login).setEnabled(visibility != View.VISIBLE);
         dialog.findViewById(R.id.cancel).setEnabled(visibility != View.VISIBLE);
-        return;
     }
 
     private void saveUserCredentials(AlertDialog dialog, String userMail, String userPass){
