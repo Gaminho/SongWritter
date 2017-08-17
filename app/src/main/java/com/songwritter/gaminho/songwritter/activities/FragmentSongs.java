@@ -75,7 +75,6 @@ public class FragmentSongs extends Fragment {
         pbSongs.setVisibility(View.VISIBLE);
         tvSongs.setText("Récupération de vos lyrics...");
 
-
         DatabaseReference myRef = Database.getTable(FirebaseAuth.getInstance().getCurrentUser(), Database.Table.LYRICS);
 
         myRef.addValueEventListener(new ValueEventListener() {

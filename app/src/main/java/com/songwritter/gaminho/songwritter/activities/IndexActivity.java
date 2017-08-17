@@ -31,19 +31,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.Utils;
+import com.songwritter.gaminho.songwritter.beans.User;
+import com.songwritter.gaminho.songwritter.interfaces.UserInteractionListener;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.Locale;
+
+import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
 public class IndexActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         FragmentSongs.OnFragmentInteractionListener,
-        FragmentProfile.OnProfileInteractionListener,
+        UserInteractionListener,
         FirebaseAuth.AuthStateListener {
 
     //Sections
@@ -224,7 +236,7 @@ public class IndexActivity extends AppCompatActivity
         }
     }
 
-    private void updateHeaderView(final boolean connected) {
+    private void updateHeaderView(final FirebaseUser user) {
         ImageView signPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.sign_pix);
         ImageView usrPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.user_pix);
         TextView headerMsg = (TextView) navigationView.getHeaderView(0).findViewById(R.id.connectedAs);
@@ -232,15 +244,16 @@ public class IndexActivity extends AppCompatActivity
         Drawable cardViewPix;
         usrPix.setImageDrawable(getDrawable(R.drawable.android));
 
-        if (connected) {
-            FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
             cardViewColor = getColor(R.color.red500);
             cardViewPix = getDrawable(R.drawable.signout);
-            //TODO: update img view
             if (user.getDisplayName() != null)
                 headerMsg.setText(String.format(Locale.FRANCE, getString(R.string.format_connected_as), user.getDisplayName()));
             else
                 headerMsg.setText(getString(R.string.state_connected));
+
+            if(getUserImg() != null)
+                Picasso.with(this).load(getUserImg()).into(usrPix);
 
         } else {
             headerMsg.setText(getString(R.string.state_not_connected));
@@ -250,7 +263,7 @@ public class IndexActivity extends AppCompatActivity
 
         // Handle Menu Sections
         for (int i = SECTION_PROFILE; i < navigationView.getMenu().size(); i++){
-            navigationView.getMenu().getItem(i).setVisible(connected);
+            navigationView.getMenu().getItem(i).setVisible(user != null);
         }
 
         // CardView
@@ -261,7 +274,7 @@ public class IndexActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //User is connected
-                if (connected) {
+                if (user != null) {
                     mAuth.signOut();
                 }
 
@@ -331,33 +344,77 @@ public class IndexActivity extends AppCompatActivity
     }
 
     @Override
+    public Uri getUserImg() {
+        String uri = mSharedPreferences.getString(Utils.PREF_USER_PROFILE_URI, null);
+        return uri != null ? Uri.parse(uri) : null;
+    }
+
+    private String heyhey;
+
+    @Override
+    public void setText(String text) {
+        heyhey = text;
+    }
+
+    @Override
+    public String getText() {
+        return heyhey;
+    }
+
+    @Override
+    public void updateProfilePicture(File profilePicture) {
+        StorageReference storageRef = Database.getUserStorage(mAuth.getCurrentUser()).child(Database.STORAGE_IMAGE).child("profile.png");
+        storageRef.putFile(Uri.fromFile(profilePicture))
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        LOG("Download Uri: " + downloadUrl);
+                        updatePhotoUri(downloadUrl);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        LOG("onSuccess: " + false + " - " + exception);
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        LOG("onComplete: " + task.isSuccessful());
+                    }
+                });
+    }
+
+    @Override
+    public void updatePhotoUri(final Uri photoUri) {
+        LOG("Photo: " + photoUri);
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(photoUri)
+                .build();
+
+        mAuth.getCurrentUser().updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            LOG("User profile updated");
+                            mSharedPreferences.edit().putString(Utils.PREF_USER_PROFILE_URI, photoUri.toString()).apply();
+                            updateHeaderView(mAuth.getCurrentUser());
+                        }
+                    }
+                });
+    }
+
+    @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
-            updateHeaderView(true);
-            //                   updateHeaderView(R.layout.drawer_header, "Connecté en tant que " + user.getDisplayName());
-
-//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-//                            .setDisplayName("Gaminho")
-//                            .setPhotoUri(Uri.parse("findicons.com/files/icons/1072/face_avatars/300/a04.png"))
-//                            .build();
-//
-//                    user.updateProfile(profileUpdates)
-//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful()) {
-//                                        Log.e("Update", "User profile updated.");
-//                                    }
-//                                }
-//                            });
-
-
-
+            updateHeaderView(mAuth.getCurrentUser());
         } else {
-            updateHeaderView(false);
-//                    updateHeaderView(R.layout.drawer_header, "Non connecté");
+            updateHeaderView(null);
         }
     }
 
@@ -513,7 +570,7 @@ public class IndexActivity extends AppCompatActivity
                                 }
 
                                 handleProgress(dialog, View.INVISIBLE);
-                                updateHeaderView(task.isSuccessful());
+                                updateHeaderView(mAuth.getCurrentUser());
                             }
                         });
                 break;

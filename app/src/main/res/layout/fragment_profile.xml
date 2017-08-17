@@ -24,11 +24,30 @@
             android:orientation="horizontal"
             android:padding="4dp">
 
-            <ImageView
+            <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/img_music"/>
+                android:layout_weight="1">
+
+                    <ImageView
+                        android:id="@+id/user_avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/img_music"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:background="#5b000000"
+                        android:textColor="@color/white0"
+                        android:gravity="center"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:text="Modifier la photo"/>
+
+
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
