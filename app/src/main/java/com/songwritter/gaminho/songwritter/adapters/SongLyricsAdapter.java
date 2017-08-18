@@ -1,4 +1,4 @@
-package com.songwritter.gaminho.songwritter.activities.adapters;
+package com.songwritter.gaminho.songwritter.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.R;
-import com.songwritter.gaminho.songwritter.activities.SongActivity;
+import com.songwritter.gaminho.songwritter.activities.songs.ActivitySong;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class SongLyricsAdapter extends BaseAdapter {
     public View getView(final int position, View view, ViewGroup viewGroup) {
 
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View row = inflater.inflate(R.layout.adapter_songslyrics, viewGroup, false);
+        View row = inflater.inflate(R.layout.adapter_songs, viewGroup, false);
 
         final SongLyrics songLyrics = mLyrics.get(position);
         Drawable imgDrawable;
@@ -72,10 +72,13 @@ public class SongLyricsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(SongActivity.SONG_LYRICS, songLyrics);
-                Intent intent = new Intent(mContext, SongActivity.class);
-                intent.setAction(Utils.ACTION_VIEW);
+                bundle.putSerializable(ActivitySong.SONG_LYRICS, songLyrics);
+                //Intent intent = new Intent(mContext, ActivitySong.class);
+
+                Intent intent = new Intent(mContext, ActivitySong.class);
+                //intent.setAction(Utils.ACTION_VIEW);
                 intent.putExtras(bundle);
+
                 mContext.startActivity(intent);
             }
         });

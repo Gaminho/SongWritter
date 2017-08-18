@@ -47,5 +47,7 @@
     <!-- Formats -->
     <string name="format_connected_as">Connecté en tant que %s</string>
     <string name="format_last_update">"Modif. %s</string>
+    <string name="title_activity_test">ActivityTest</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

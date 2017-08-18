@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="50dp">
+
+    <RelativeLayout
+        android:id="@+id/top1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/top_actions_btn">
+
+        <ImageView
+            android:id="@+id/icon1"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:src="@mipmap/ic_format_align_left_white_18dp"/>
+
+        <TextView
+            android:id="@+id/text1"
+            android:layout_below="@+id/icon1"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="@color/white0"
+            android:text="Paroles"/>
+
+        <LinearLayout
+            android:id="@+id/under1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top2"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/top_actions_btn">
+
+        <ImageView
+            android:id="@+id/icon2"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:tint="@color/colorAccent"
+            android:src="@mipmap/ic_mode_edit_white_18dp"/>
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_below="@+id/icon2"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="bold"
+            android:text="Modifier"/>
+
+        <LinearLayout
+            android:id="@+id/under2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top3"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/top_actions_btn">
+
+        <ImageView
+            android:id="@+id/icon3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:tint="@color/white0"
+            android:src="@drawable/musical_notes1600"/>
+
+        <TextView
+            android:id="@+id/text3"
+            android:layout_below="@+id/icon3"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="@color/white0"
+            android:textStyle="bold"
+            android:text="Musique"/>
+
+        <LinearLayout
+            android:id="@+id/under3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top4"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/top_actions_btn">
+
+        <ImageView
+            android:id="@+id/icon4"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:tint="@color/white0"
+            android:src="@mipmap/ic_keyboard_voice_white_18dp"/>
+
+        <TextView
+            android:id="@+id/text4"
+            android:layout_below="@+id/icon4"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="@color/white0"
+            android:textStyle="bold"
+            android:text="Records"/>
+
+        <LinearLayout
+            android:id="@+id/under4"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/top5"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@drawable/top_actions_btn">
+
+        <ImageView
+            android:id="@+id/icon5"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:tint="@color/white0"
+            android:src="@mipmap/ic_share_white_18dp"/>
+
+        <TextView
+            android:id="@+id/text5"
+            android:layout_below="@+id/icon5"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10dp"
+            android:textColor="@color/white0"
+            android:textStyle="bold"
+            android:text="Partager"/>
+
+        <LinearLayout
+            android:id="@+id/under5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:orientation="horizontal"
+            android:background="@color/colorAccent"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -36,6 +36,14 @@ public class SongLyrics implements Serializable {
         this.lastUpdate = lastUpdate;
     }
 
+    public SongLyrics(String title, String content, long creation, long lastUpdate) {
+        this.title = title;
+        this.content = content;
+        this.author = "";
+        this.creation = creation;
+        this.lastUpdate = lastUpdate;
+    }
+
     public SongLyrics(String title, String content, String author) {
         this.title = title;
         this.content = content;

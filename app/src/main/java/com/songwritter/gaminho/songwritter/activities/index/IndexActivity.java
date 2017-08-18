@@ -1,4 +1,4 @@
-package com.songwritter.gaminho.songwritter.activities;
+package com.songwritter.gaminho.songwritter.activities.index;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -21,6 +21,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -43,7 +44,7 @@ import com.google.firebase.storage.UploadTask;
 import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.Utils;
-import com.songwritter.gaminho.songwritter.beans.User;
+import com.songwritter.gaminho.songwritter.activities.songs.ActivitySong;
 import com.songwritter.gaminho.songwritter.interfaces.UserInteractionListener;
 import com.squareup.picasso.Picasso;
 
@@ -166,13 +167,12 @@ public class IndexActivity extends AppCompatActivity
             return true;
         }
 
-        else if(id == R.id.action_add_lyrics){
-            startActivity(new Intent(this, SongActivity.class).setAction(Utils.ACTION_CREATE));
+        else if(id == R.id.action_add){
+            startActivity(new Intent(this, ActivitySong.class).setAction(Utils.ACTION_CREATE));
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
     // Managing UI
 
@@ -233,6 +233,7 @@ public class IndexActivity extends AppCompatActivity
             toggle.syncState();
 
             mCurrentSection = position;
+            invalidateOptionsMenu();
         }
     }
 
@@ -253,7 +254,7 @@ public class IndexActivity extends AppCompatActivity
                 headerMsg.setText(getString(R.string.state_connected));
 
             if(getUserImg() != null)
-                Picasso.with(this).load(getUserImg()).into(usrPix);
+                Picasso.with(this).load(getUserImg()).placeholder(R.mipmap.ic_account_circle_white_48dp).into(usrPix);
 
         } else {
             headerMsg.setText(getString(R.string.state_not_connected));
@@ -369,27 +370,18 @@ public class IndexActivity extends AppCompatActivity
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        LOG("Download Uri: " + downloadUrl);
                         updatePhotoUri(downloadUrl);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        LOG("onSuccess: " + false + " - " + exception);
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                        LOG("onComplete: " + task.isSuccessful());
                     }
                 });
     }
 
     @Override
     public void updatePhotoUri(final Uri photoUri) {
-        LOG("Photo: " + photoUri);
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setPhotoUri(photoUri)
                 .build();

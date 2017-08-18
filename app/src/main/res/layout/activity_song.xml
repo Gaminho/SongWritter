@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.songwritter.gaminho.songwritter.activities.SongActivity"
-    android:padding="5dp"
-    android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <include
+        android:id="@+id/top_songs"
+        layout="@layout/top_actions"/>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-    <EditText
-        android:id="@+id/etTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textCapSentences|textMultiLine"
-        android:hint="@string/ph_title"/>
+        android:layout_height="match_parent">
 
-    <EditText
-        android:layout_marginTop="5dp"
-        android:id="@+id/etContent"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:inputType="textCapSentences|textMultiLine"
-        android:gravity="top"
-        android:hint="@string/ph_content"/>
+        <ProgressBar
+            android:id="@+id/pb_songs"
+            android:layout_width="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_height="35dp"
+            android:padding="@dimen/appbar_padding_top"/>
 
-    </LinearLayout>
+        <FrameLayout
+            android:id="@+id/song_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
 
 
-</ScrollView>
+</LinearLayout>

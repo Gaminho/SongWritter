@@ -1,4 +1,4 @@
-package com.songwritter.gaminho.songwritter.activities;
+package com.songwritter.gaminho.songwritter.activities.index;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -21,7 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.R;
-import com.songwritter.gaminho.songwritter.activities.adapters.SongLyricsAdapter;
+import com.songwritter.gaminho.songwritter.adapters.SongLyricsAdapter;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
 import java.util.ArrayList;
@@ -116,8 +116,16 @@ public class FragmentSongs extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.song_lyrics, menu);
+        inflater.inflate(R.menu.songs, menu);
         super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_delete).setVisible(false);
+        menu.findItem(R.id.action_save).setVisible(false);
+        menu.findItem(R.id.action_add).setVisible(true);
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override

@@ -13,7 +13,7 @@
         app:showAsAction="ifRoom"/>
 
     <item
-        android:id="@+id/action_edit"
-        android:title="Modifier"
+        android:id="@+id/action_add"
+        android:title="Ajouter"
         app:showAsAction="ifRoom"/>
 </menu>

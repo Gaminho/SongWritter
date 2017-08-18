@@ -1,4 +1,4 @@
-package com.songwritter.gaminho.songwritter.activities;
+package com.songwritter.gaminho.songwritter.activities.index;
 
 import android.app.Fragment;
 import android.content.Context;
@@ -73,7 +73,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
         mIVUserAvatar.setOnClickListener(this);
 
         Uri photoUrl = mListener.getUserImg() != null ? mListener.getUserImg() : null;
-        Picasso.with(getContext()).load(photoUrl).placeholder(R.drawable.avatar_placeholder).into(mIVUserAvatar);
+        Picasso.with(getContext()).load(photoUrl).placeholder(R.mipmap.ic_account_circle_white_48dp).into(mIVUserAvatar);
         return view;
     }
 
@@ -84,14 +84,8 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
             mListener = (UserInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnProfileInteractionListener");
+                    + " must implement UserInteractionListener");
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.song_lyrics, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -149,7 +143,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
             if(key.equals(Utils.PREF_USER_PROFILE_URI)){
                 String uri = mSharedPreferences.getString(Utils.PREF_USER_PROFILE_URI, null);
                 if(mIVUserAvatar != null && getActivity() != null && uri != null) {
-                    Picasso.with(getContext()).load(Uri.parse(uri)).placeholder(R.drawable.avatar_placeholder).into(mIVUserAvatar);
+                    Picasso.with(getContext()).load(Uri.parse(uri)).placeholder(R.mipmap.ic_account_circle_white_48dp).into(mIVUserAvatar);
                 }
             }
         }

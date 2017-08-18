@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="15dp"
         android:layout_height="10dp"
-        android:src="@drawable/ic_schedule_white_48dp"
+        android:src="@mipmap/ic_schedule_white_48dp"
         android:tint="@color/grey"/>
 
     <TextView

@@ -27,11 +27,11 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_friends"
-            android:icon="@drawable/ic_menu_share"
+            android:icon="@mipmap/ic_group_white_48dp"
             android:title="@string/nav_friends" />
         <item
             android:id="@+id/nav_msg"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@mipmap/ic_inbox_white_48dp"
             android:title="@string/nav_msg" />
     </group>
 </menu>
