@@ -24,8 +24,7 @@ public class AddNewSong extends Fragment {
     }
 
     public static AddNewSong newInstance() {
-        AddNewSong fragment = new AddNewSong();
-        return fragment;
+        return new AddNewSong();
     }
 
     @Override

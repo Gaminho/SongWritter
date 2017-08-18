@@ -16,22 +16,19 @@ import com.songwritter.gaminho.songwritter.R;
 public class FragmentGeneral extends Fragment {
 
     // BUNDLE
-    public static final String INDEX = "pupil_id";
+    private static final String INDEX = "pupil_id";
 
-    int mIndex;
-    String url ="http:////www.youtubeinmp3.com/fetch/?video=https://www.youtube.com/watch?v=mm8S1lwzrGA";
+    private int mIndex;
+    //String url ="http:////www.youtubeinmp3.com/fetch/?video=https://www.youtube.com/watch?v=mm8S1lwzrGA";
 
 
     // Fragment life cycle
-    public static FragmentGeneral newInstance() {
-        return new FragmentGeneral();
-    }
     public static FragmentGeneral newInstance(int id) {
-        FragmentGeneral fragmentSuivi = new FragmentGeneral();
+        FragmentGeneral fragmentGeneral = new FragmentGeneral();
         Bundle args = new Bundle();
         args.putInt(INDEX, id);
-        fragmentSuivi.setArguments(args);
-        return fragmentSuivi;
+        fragmentGeneral.setArguments(args);
+        return fragmentGeneral;
     }
 
 

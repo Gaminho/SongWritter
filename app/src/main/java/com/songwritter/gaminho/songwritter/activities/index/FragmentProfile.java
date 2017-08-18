@@ -8,8 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,33 +23,18 @@ import java.io.File;
 
 public class FragmentProfile extends Fragment implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    private static final String LOADING = "loading";
-
-    UserInteractionListener mListener;
+    private UserInteractionListener mListener;
 
     // View
     private ImageView mIVUserAvatar;
-    private TextView mTVUserName;
 
     private SharedPreferences mSharedPreferences;
 
     public FragmentProfile() {
     }
 
-    public static FragmentProfile newInstance(String param1, String param2) {
-        FragmentProfile fragment = new FragmentProfile();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public static FragmentProfile newInstance() {
-        FragmentProfile fragment = new FragmentProfile();
-        return fragment;
+        return new FragmentProfile();
     }
 
     @Override
@@ -66,7 +49,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        mTVUserName = (TextView) view.findViewById(R.id.user_name);
+        TextView mTVUserName = (TextView) view.findViewById(R.id.user_name);
         mTVUserName.setText(mListener.getUser().getDisplayName());
         ((TextView) view.findViewById(R.id.user_mail)).setText(mListener.getUser().getEmail());
         mIVUserAvatar = (ImageView) view.findViewById(R.id.user_avatar);

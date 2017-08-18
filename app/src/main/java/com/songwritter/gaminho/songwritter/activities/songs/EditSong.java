@@ -16,16 +16,16 @@ import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 
 public class EditSong extends Fragment {
 
-    SongInteractionListener mListener;
+    private SongInteractionListener mListener;
 
-    EditText mETContent, mETTitle;
+    private EditText mETContent;
+    private EditText mETTitle;
 
     public EditSong() {
     }
 
     public static EditSong newInstance() {
-        EditSong fragment = new EditSong();
-        return fragment;
+        return new EditSong();
     }
 
     @Override
