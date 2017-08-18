@@ -1,6 +1,7 @@
 package com.songwritter.gaminho.songwritter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -9,8 +10,10 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -18,8 +21,13 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -115,4 +123,47 @@ public class Utils {
         return null;
     }
 
+    public static File retrieveFileFromUri(Uri uri, Context context){
+        String filename;
+        String mimeType = context.getContentResolver().getType(uri);
+        File file;
+        if (mimeType == null) {
+            return null;
+        }
+        else {
+            Cursor returnCursor = context.getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+            returnCursor.moveToFirst();
+            filename = returnCursor.getString(nameIndex);
+
+            String sourcePath = context.getExternalFilesDir(null).toString();
+
+            file = new File(sourcePath + "/beats/");
+            if(!file.exists() && !file.mkdirs()) {
+                return null;
+            }
+
+            LOG("Exist: " + file.exists());
+
+            file = new File(file, filename);
+            LOG(file.getAbsolutePath());
+
+            try (InputStream is = context.getContentResolver().openInputStream(uri); OutputStream os = new FileOutputStream(file)) {
+                byte[] buffer = new byte[1024];
+                int length;
+
+                while ((length = is.read(buffer)) > 0) {
+                    os.write(buffer, 0, length);
+                }
+
+                is.close();
+                os.close();
+                return file;
+            } catch (Exception e) {
+                LOG("Exception (retrieveFileFromUri): " + e);
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.songwritter.gaminho.songwritter.beans;
 
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SongLyrics implements Serializable {
 
@@ -11,6 +12,7 @@ public class SongLyrics implements Serializable {
     private String author;
     private long creation;
     private long lastUpdate;
+    private List<Instrumental> beats;
 
     public SongLyrics() {
     }
@@ -82,7 +84,13 @@ public class SongLyrics implements Serializable {
         this.id = id;
     }
 
+    public List<Instrumental> getBeats() {
+        return beats;
+    }
 
+    public void setBeats(List<Instrumental> beats) {
+        this.beats = beats;
+    }
 
     public long getCreation() {
         return creation;

@@ -20,10 +20,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.Utils;
+import com.songwritter.gaminho.songwritter.beans.Instrumental;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.songwritter.gaminho.songwritter.Utils.LOG;
@@ -131,6 +135,11 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
             menu.findItem(R.id.action_save).setVisible(false);
             menu.findItem(R.id.action_add).setVisible(false);
         }
+        else if (mCurrentSection == SECTION_MUSIC){
+            menu.findItem(R.id.action_delete).setVisible(false);
+            menu.findItem(R.id.action_save).setVisible(false);
+            menu.findItem(R.id.action_add).setVisible(true);
+        }
         else{
             menu.findItem(R.id.action_delete).setVisible(false);
             menu.findItem(R.id.action_save).setVisible(false);
@@ -213,7 +222,7 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
                         pixId = R.id.icon3;
                         txtId = R.id.text3;
                         underId = R.id.under3;
-                        fragment = ViewSong.newInstance();
+                        fragment = AudioSong.newInstance();
                         break;
                     case SECTION_RECORDS:
                         pixId = R.id.icon4;
@@ -318,6 +327,33 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
     @Override
     public void deleteSong(SongLyrics songLyrics) {
         deleteDialog(songLyrics).show();
+    }
+
+    @Override
+    public void addABeat(final Instrumental beat) {
+        List<Instrumental> beats = mSongLyrics.getBeats() != null ? mSongLyrics.getBeats() : new ArrayList<Instrumental>();
+        beats.add(beat);
+        mSongLyrics.setBeats(beats);
+        mSongLyrics.setId(null);
+        mSongLyrics.setLastUpdate(System.currentTimeMillis());
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(mSongKey, mSongLyrics);
+        DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+        ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                mPBSongs.setVisibility(View.GONE);
+                if (databaseError != null) {
+                    Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplication(), beat.getTitle()+" has been add to beats !", Toast.LENGTH_SHORT).show();
+                    mCurrentSection = -1;
+                    selectTab(SECTION_MUSIC);
+                }
+            }
+        });
     }
 
     private AlertDialog.Builder quitEditDialog(final int position){

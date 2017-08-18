@@ -22,7 +22,7 @@
         android:id="@+id/user_remind"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/remind_credentials"/>
+        android:hint="@string/remind_credentials"/>
 
     <TextView
         android:id="@+id/create_account"

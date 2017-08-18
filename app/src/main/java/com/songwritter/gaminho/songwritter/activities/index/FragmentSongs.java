@@ -1,8 +1,6 @@
 package com.songwritter.gaminho.songwritter.activities.index;
 
 import android.app.Fragment;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +24,7 @@ import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class FragmentSongs extends Fragment {
@@ -33,27 +32,11 @@ public class FragmentSongs extends Fragment {
     List<SongLyrics> mSongs;
     ProgressBar pbSongs;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-
-    private OnFragmentInteractionListener mListener;
-
     public FragmentSongs() {
     }
 
-    public static FragmentSongs newInstance(String param1, String param2) {
-        FragmentSongs fragment = new FragmentSongs();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public static FragmentSongs newInstance() {
-        FragmentSongs fragment = new FragmentSongs();
-        return fragment;
+        return new FragmentSongs();
     }
 
     @Override
@@ -70,10 +53,10 @@ public class FragmentSongs extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         final ListView lvSongs = (ListView) view.findViewById(R.id.lv_songs);
-        final TextView tvSongs = (TextView) view.findViewById(R.id.songs_count);
-        pbSongs = (ProgressBar) view.findViewById(R.id.pb_songs);
+        final TextView tvSongs = (TextView) view.findViewById(R.id.loading_bar).findViewById(R.id.songs_count);
+        pbSongs = (ProgressBar) view.findViewById(R.id.loading_bar).findViewById(R.id.pb_songs);
         pbSongs.setVisibility(View.VISIBLE);
-        tvSongs.setText("Récupération de vos lyrics...");
+        tvSongs.setText(getString(R.string.loading_songs));
 
         DatabaseReference myRef = Database.getTable(FirebaseAuth.getInstance().getCurrentUser(), Database.Table.LYRICS);
 
@@ -82,14 +65,15 @@ public class FragmentSongs extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 mSongs.clear();
-                for (DataSnapshot songSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
                     SongLyrics songLyrics = songSnapshot.getValue(SongLyrics.class);
                     songLyrics.setId(songSnapshot.getKey());
                     mSongs.add(songLyrics);
                 }
 
                 lvSongs.setAdapter(new SongLyricsAdapter(getActivity(), mSongs));
-                tvSongs.setText("Vous avez " + dataSnapshot.getChildrenCount() + " textes");
+                if(getActivity() != null)
+                    tvSongs.setText(String.format(Locale.FRANCE, getString(R.string.format_songs_count), mSongs.size()));
                 pbSongs.setVisibility(View.INVISIBLE);
             }
 
@@ -100,18 +84,6 @@ public class FragmentSongs extends Fragment {
         });
 
         return view;
-    }
-
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnProfileInteractionListener");
-        }
     }
 
     @Override
@@ -127,15 +99,4 @@ public class FragmentSongs extends Fragment {
         menu.findItem(R.id.action_add).setVisible(true);
         super.onPrepareOptionsMenu(menu);
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        void onFragmentInteraction(Uri uri);
-    }
-
 }

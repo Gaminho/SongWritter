@@ -1,5 +1,6 @@
 package com.songwritter.gaminho.songwritter.activities.index;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -33,7 +34,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
     public FragmentProfile() {
     }
 
-    public static FragmentProfile newInstance() {
+    protected static FragmentProfile newInstance() {
         return new FragmentProfile();
     }
 
@@ -82,7 +83,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Utils.RESULT_LOAD_IMAGE && resultCode == getActivity().RESULT_OK && null != data) {
+        if (requestCode == Utils.RESULT_LOAD_IMAGE && resultCode == Activity.RESULT_OK && null != data) {
 
             Uri selectedImage = data.getData();
 
@@ -98,7 +99,7 @@ public class FragmentProfile extends Fragment implements View.OnClickListener, S
 
         }
 
-        if (requestCode == Utils.RESULT_PIC_CROP && resultCode == getActivity().RESULT_OK && null != data) {
+        if (requestCode == Utils.RESULT_PIC_CROP && resultCode == Activity.RESULT_OK && null != data) {
             Bundle extras = data.getExtras();
             final Bitmap selectedBitmap = extras.getParcelable("data");
             final Bitmap userPix = Utils.getRoundedCroppedBitmap(selectedBitmap);

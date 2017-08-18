@@ -6,27 +6,9 @@
     android:orientation="vertical"
     tools:context="com.songwritter.gaminho.songwritter.activities.index.FragmentSongs">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:orientation="horizontal"
-        android:padding="4dp">
-
-        <TextView
-            android:id="@+id/songs_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:text="Récupération de vos lyrics" />
-
-        <ProgressBar
-            android:id="@+id/pb_songs"
-            android:layout_width="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_height="match_parent"/>
-
-    </RelativeLayout>
+    <include
+        android:id="@+id/loading_bar"
+        layout="@layout/sub_bar"/>
 
     <ListView
         android:id="@+id/lv_songs"

@@ -54,7 +54,6 @@ import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
 public class IndexActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        FragmentSongs.OnFragmentInteractionListener,
         UserInteractionListener,
         FirebaseAuth.AuthStateListener {
 
@@ -329,11 +328,6 @@ public class IndexActivity extends AppCompatActivity
     }
 
     // Interface
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        Log.e("ntd", "Nothing to do!");
-    }
 
     @Override
     public FirebaseUser getUser() {
