@@ -201,7 +201,7 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
                         fragment = AudioSong.newInstance();
                         break;
                     case SECTION_RECORDS:
-                        fragment = ViewSong.newInstance();
+                        fragment = RecordSong.newInstance();
                         break;
                     case SECTION_SHARE:
                         fragment = ViewSong.newInstance();
