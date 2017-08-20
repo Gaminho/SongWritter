@@ -2,16 +2,13 @@ package com.songwritter.gaminho.songwritter.activities.songs;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,20 +17,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.songwritter.gaminho.songwritter.Database;
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.Utils;
+import com.songwritter.gaminho.songwritter.beans.Action;
 import com.songwritter.gaminho.songwritter.beans.Instrumental;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
+import com.songwritter.gaminho.songwritter.customviews.CustomAlertDialogBuilder;
+import com.songwritter.gaminho.songwritter.customviews.MusicPlayer;
+import com.songwritter.gaminho.songwritter.customviews.MyActionBar;
 import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import static com.songwritter.gaminho.songwritter.Utils.LOG;
-
-public class ActivitySong extends AppCompatActivity implements View.OnClickListener,
-        SongInteractionListener {
+public class ActivitySong extends AppCompatActivity implements SongInteractionListener {
 
     private static final int SECTION_VIEW = 0;
     private static final int SECTION_EDIT = 1;
@@ -49,7 +47,13 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
     private Fragment mCurrentFragment;
     private ProgressBar mPBSongs;
 
+    private MyActionBar mActionBar;
+
     private int mCurrentSection = -1;
+
+    private MusicPlayer mMusicPlayer;
+
+    // Activity Life Cycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,16 +62,15 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
 
         mAuth = FirebaseAuth.getInstance();
 
+        mPBSongs = (ProgressBar) findViewById(R.id.pb_songs);
+        mPBSongs.setVisibility(View.GONE);
+
+        mActionBar = setUpActionBar(R.id.actionBar);
+
         if(getIntent().getExtras() != null) {
             mSongKey = ((SongLyrics) getIntent().getExtras().getSerializable(SONG_LYRICS)).getId();
             mSongLyrics = (SongLyrics) getIntent().getExtras().getSerializable(SONG_LYRICS);
-            selectTab(SECTION_VIEW);
-
-            findViewById(R.id.top_songs).findViewById(R.id.top1).setOnClickListener(this);
-            findViewById(R.id.top_songs).findViewById(R.id.top2).setOnClickListener(this);
-            findViewById(R.id.top_songs).findViewById(R.id.top3).setOnClickListener(this);
-            findViewById(R.id.top_songs).findViewById(R.id.top4).setOnClickListener(this);
-            findViewById(R.id.top_songs).findViewById(R.id.top5).setOnClickListener(this);
+            mActionBar.click(SECTION_VIEW);
         }
 
         else if(getIntent().getAction() != null && getIntent().getAction().equals(Utils.ACTION_CREATE)){
@@ -75,46 +78,8 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
             selectTab(SECTION_CREATE);
         }
 
-        mPBSongs = (ProgressBar) findViewById(R.id.pb_songs);
-        mPBSongs.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.top1:
-                selectTab(SECTION_VIEW);
-                break;
-            case R.id.top2:
-                selectTab(SECTION_EDIT);
-                break;
-            case R.id.top3:
-                selectTab(SECTION_MUSIC);
-                break;
-            case R.id.top4:
-                selectTab(SECTION_RECORDS);
-                break;
-            case R.id.top5:
-                selectTab(SECTION_SHARE);
-                break;
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(mCurrentSection == SECTION_EDIT) {
-            if(mCurrentFragment instanceof EditSong)
-                if(needUpdate(((EditSong) mCurrentFragment).getSongLyricsFromUI())) {
-                    quitEditDialog(SECTION_VIEW).show();
-                }
-                else {
-                    mCurrentSection = -1;
-                    selectTab(SECTION_VIEW);
-                }
-        }
-        else {
-            super.onBackPressed();
-        }
+        mMusicPlayer = (MusicPlayer) findViewById(R.id.music_player);
+        mMusicPlayer.setPlaylist(mSongLyrics.getBeats());
     }
 
     @Override
@@ -158,86 +123,89 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if(mCurrentSection == SECTION_EDIT) {
+            if(mCurrentFragment instanceof EditSong) {
+
+                if (((EditSong) mCurrentFragment).needUpdate()) {
+                    quitEditDialog(SECTION_VIEW).show();
+                }
+                else {
+                    mCurrentSection = -1;
+                    mActionBar.click(SECTION_VIEW);
+                }
+            }
+        }
+        else if (mCurrentSection == SECTION_MUSIC){
+            if(mMusicPlayer != null && mMusicPlayer.isPlaying()) {
+                backWhilePlayingDialog(SECTION_VIEW).show();
+            }
+            else{
+                mCurrentSection = -1;
+                mActionBar.click(SECTION_VIEW);
+            }
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mMusicPlayer != null && mMusicPlayer.isPlaying())
+            mMusicPlayer.stop();
+    }
+
     // Utils
 
-    private void selectTab(final int position){
+    private void selectTab(int position){
 
         if(mCurrentSection != position) {
 
             if (mCurrentSection == SECTION_EDIT) {
-                if(mCurrentFragment instanceof EditSong)
-                    if(needUpdate(((EditSong) mCurrentFragment).getSongLyricsFromUI())) {
+                if(mCurrentFragment instanceof EditSong) {
+                    if (((EditSong) mCurrentFragment).needUpdate()) {
                         quitEditDialog(position).show();
-                    }
-                    else {
+                    } else {
                         mCurrentSection = -1;
                         selectTab(position);
                     }
+                }
+            }
+
+            else if(mCurrentSection == SECTION_MUSIC){
+                if(mMusicPlayer != null && mMusicPlayer.isPlaying())
+                    backWhilePlayingDialog(position).show();
+                else {
+                    mCurrentSection = -1;
+                    selectTab(position);
+                }
             }
 
             else {
+
                 mCurrentSection = position;
 
-                ((ImageView) findViewById(R.id.top_songs).findViewById(R.id.icon1)).setColorFilter(getColor(R.color.white0));
-                ((ImageView) findViewById(R.id.top_songs).findViewById(R.id.icon2)).setColorFilter(getColor(R.color.white0));
-                ((ImageView) findViewById(R.id.top_songs).findViewById(R.id.icon3)).setColorFilter(getColor(R.color.white0));
-                ((ImageView) findViewById(R.id.top_songs).findViewById(R.id.icon4)).setColorFilter(getColor(R.color.white0));
-                ((ImageView) findViewById(R.id.top_songs).findViewById(R.id.icon5)).setColorFilter(getColor(R.color.white0));
-
-                findViewById(R.id.top_songs).findViewById(R.id.under1).setVisibility(View.INVISIBLE);
-                findViewById(R.id.top_songs).findViewById(R.id.under2).setVisibility(View.INVISIBLE);
-                findViewById(R.id.top_songs).findViewById(R.id.under3).setVisibility(View.INVISIBLE);
-                findViewById(R.id.top_songs).findViewById(R.id.under4).setVisibility(View.INVISIBLE);
-                findViewById(R.id.top_songs).findViewById(R.id.under5).setVisibility(View.INVISIBLE);
-
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text1)).setTextColor(getColor(R.color.white0));
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text1)).setTypeface(null, Typeface.NORMAL);
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text2)).setTextColor(getColor(R.color.white0));
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text2)).setTypeface(null, Typeface.NORMAL);
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text3)).setTextColor(getColor(R.color.white0));
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text3)).setTypeface(null, Typeface.NORMAL);
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text4)).setTextColor(getColor(R.color.white0));
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text4)).setTypeface(null, Typeface.NORMAL);
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text5)).setTextColor(getColor(R.color.white0));
-                ((TextView) findViewById(R.id.top_songs).findViewById(R.id.text5)).setTypeface(null, Typeface.NORMAL);
-
-                int pixId = -1;
-                int txtId = -1;
-                int underId = -1;
                 Fragment fragment = null;
                 switch (position) {
                     case SECTION_VIEW:
-                        pixId = R.id.icon1;
-                        txtId = R.id.text1;
-                        underId = R.id.under1;
                         fragment = ViewSong.newInstance();
                         break;
                     case SECTION_EDIT:
-                        pixId = R.id.icon2;
-                        txtId = R.id.text2;
-                        underId = R.id.under2;
                         fragment = EditSong.newInstance();
                         break;
                     case SECTION_MUSIC:
-                        pixId = R.id.icon3;
-                        txtId = R.id.text3;
-                        underId = R.id.under3;
                         fragment = AudioSong.newInstance();
                         break;
                     case SECTION_RECORDS:
-                        pixId = R.id.icon4;
-                        txtId = R.id.text4;
-                        underId = R.id.under4;
                         fragment = ViewSong.newInstance();
                         break;
                     case SECTION_SHARE:
-                        pixId = R.id.icon5;
-                        txtId = R.id.text5;
-                        underId = R.id.under5;
                         fragment = ViewSong.newInstance();
                         break;
                     case SECTION_CREATE:
-                        LOG("SECTION_CREATE");
                         fragment = AddNewSong.newInstance();
                         break;
                 }
@@ -247,24 +215,154 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
                         .replace(R.id.song_fragment, fragment)
                         .commit();
 
-                if(position != SECTION_CREATE) {
-                    ((ImageView) findViewById(R.id.top_songs).findViewById(pixId)).setColorFilter(getColor(R.color.colorAccent));
-                    findViewById(R.id.top_songs).findViewById(underId).setVisibility(View.VISIBLE);
-                    ((TextView) findViewById(R.id.top_songs).findViewById(txtId)).setTextColor(getColor(R.color.colorAccent));
-                    ((TextView) findViewById(R.id.top_songs).findViewById(txtId)).setTypeface(null, Typeface.BOLD);
+                if(position == SECTION_CREATE){
+                    mActionBar.active(false);
                 }
-                else{
-                    findViewById(R.id.top_songs).setEnabled(false);
-                }
+
                 invalidateOptionsMenu();
             }
         }
     }
 
-    private boolean needUpdate(SongLyrics songLyrics){
-        return !songLyrics.getTitle().equals(mSongLyrics.getTitle())
-                || !songLyrics.getContent().equals(mSongLyrics.getContent());
+    private MyActionBar setUpActionBar(int barId){
+
+        String[] sections = getResources().getStringArray(R.array.song_sections);
+
+        final MyActionBar actionButton = (MyActionBar) findViewById(barId);
+        List<Action> actions = new ArrayList<>();
+        actions.add(new Action(R.mipmap.ic_format_align_left_white_18dp, sections[SECTION_VIEW], new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectTab(SECTION_VIEW);
+                actionButton.setSelected(SECTION_VIEW);
+            }
+        }));
+
+        actions.add(new Action(R.mipmap.ic_mode_edit_white_18dp, sections[SECTION_EDIT], new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectTab(SECTION_EDIT);
+                actionButton.setSelected(SECTION_EDIT);
+            }
+        }));
+        actions.add(new Action(R.drawable.musical_notes1600, sections[SECTION_MUSIC], new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectTab(SECTION_MUSIC);
+                actionButton.setSelected(SECTION_MUSIC);
+            }
+        }));
+        actions.add(new Action(R.mipmap.ic_keyboard_voice_white_18dp, sections[SECTION_RECORDS], new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectTab(SECTION_RECORDS);
+                actionButton.setSelected(SECTION_RECORDS);
+            }
+        }));
+        actions.add(new Action(R.mipmap.ic_share_white_18dp, sections[SECTION_SHARE], new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectTab(SECTION_SHARE);
+                actionButton.setSelected(SECTION_SHARE);
+            }
+        }));
+
+        actionButton.setActions(actions);
+
+        return actionButton;
     }
+
+    private CustomAlertDialogBuilder quitEditDialog(final int position){
+
+        CustomAlertDialogBuilder builder = new CustomAlertDialogBuilder(this);
+
+        builder.setTitle(getString(R.string.dialog_title_warning));
+        builder.setMessage(getString(R.string.dialog_save_modification));
+
+        builder.setPositiveButton(getString(R.string.dialog_quit_without_saving), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mCurrentSection = -1;
+                mActionBar.click(position);
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNeutralButton(getString(R.string.cancel), null);
+
+        builder.setNegativeButton(getString(R.string.dialog_save_and_quit), new DialogInterface.OnClickListener() { // define the 'Cancel' button
+            public void onClick(DialogInterface dialog, int which) {
+                if(mCurrentFragment instanceof EditSong)
+                    updateSong(((EditSong) mCurrentFragment).getSongLyricsFromUI());
+                dialog.cancel();
+            }
+        });
+
+        return builder;
+    }
+
+    private CustomAlertDialogBuilder backWhilePlayingDialog(final int position){
+        CustomAlertDialogBuilder builder = new CustomAlertDialogBuilder(this);
+        builder.setTitle(getString(R.string.dialog_title_media_playing));
+        builder.setMessage(getString(R.string.dialog_continue_playing));
+
+        builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                mCurrentSection = -1;
+                mActionBar.click(position);
+            }
+        });
+
+        builder.setNeutralButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setNegativeButton(getString(R.string.dialog_stop_playing), new DialogInterface.OnClickListener() { // define the 'Cancel' button
+            public void onClick(DialogInterface dialog, int which) {
+                mMusicPlayer.stop();
+                mCurrentSection = -1;
+                mActionBar.click(position);
+            }
+        });
+        return builder;
+    }
+
+    private AlertDialog.Builder deleteDialog(final SongLyrics songLyrics){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getString(R.string.dialog_title_warning));
+        alert.setMessage(String.format(Locale.FRANCE,getString(R.string.format_delete_song), songLyrics.getTitle()));
+
+        alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+                ref = ref.child(songLyrics.getId());
+                ref.removeValue(new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        Toast.makeText(getApplication(),  String.format(Locale.FRANCE, getString(R.string.format_has_been_deleted), songLyrics.getTitle()), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+            }
+        });
+
+        alert.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        return alert;
+    }
+
+
+    // SongInteractionListener
 
     @Override
     public SongLyrics getSongLyrics() {
@@ -274,37 +372,30 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
     @Override
     public void updateSong(SongLyrics songLyrics) {
 
-        if(needUpdate(songLyrics)) {
+        mPBSongs.setVisibility(View.VISIBLE);
 
-            mPBSongs.setVisibility(View.VISIBLE);
+        mSongLyrics.setId(null);
+        mSongLyrics.setContent(songLyrics.getContent());
+        mSongLyrics.setTitle(songLyrics.getTitle());
+        mSongLyrics.setLastUpdate(System.currentTimeMillis());
 
-            mSongLyrics.setId(null);
-            mSongLyrics.setContent(songLyrics.getContent());
-            mSongLyrics.setTitle(songLyrics.getTitle());
-            mSongLyrics.setLastUpdate(System.currentTimeMillis());
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(mSongKey, mSongLyrics);
+        DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+        ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put(mSongKey, mSongLyrics);
-            DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
-            ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
-                    mPBSongs.setVisibility(View.GONE);
-                    if (databaseError != null) {
-                        Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getApplication(), mSongLyrics.getTitle()+" has been updated!", Toast.LENGTH_SHORT).show();
-                        mCurrentSection = -1;
-                        selectTab(SECTION_VIEW);
-                    }
+                mPBSongs.setVisibility(View.GONE);
+                if (databaseError != null) {
+                    Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplication(), String.format(Locale.FRANCE, getString(R.string.format_has_been_updated), mSongLyrics.getTitle()), Toast.LENGTH_SHORT).show();
+                    mCurrentSection = -1;
+                    mActionBar.click(SECTION_VIEW);
                 }
-            });
-        }
-
-        else
-            Toast.makeText(getApplication(), "Aucune modification", Toast.LENGTH_SHORT).show();
-
+            }
+        });
     }
 
     @Override
@@ -317,7 +408,7 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
                 if (databaseError != null) {
                     Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplication(), songLyrics.getTitle()+" has been saved!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplication(), String.format(Locale.FRANCE, getString(R.string.format_has_been_saved), mSongLyrics.getTitle()), Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -331,7 +422,7 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void addABeat(final Instrumental beat) {
-        List<Instrumental> beats = mSongLyrics.getBeats() != null ? mSongLyrics.getBeats() : new ArrayList<Instrumental>();
+        final List<Instrumental> beats = mSongLyrics.getBeats() != null ? mSongLyrics.getBeats() : new ArrayList<Instrumental>();
         beats.add(beat);
         mSongLyrics.setBeats(beats);
         mSongLyrics.setId(null);
@@ -348,71 +439,17 @@ public class ActivitySong extends AppCompatActivity implements View.OnClickListe
                 if (databaseError != null) {
                     Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplication(), beat.getTitle()+" has been add to beats !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplication(), String.format(Locale.FRANCE, getString(R.string.format_beat_has_been_added),beat.getTitle()), Toast.LENGTH_SHORT).show();
                     mCurrentSection = -1;
                     selectTab(SECTION_MUSIC);
+                    mMusicPlayer.setPlaylist(beats);
                 }
             }
         });
     }
 
-    private AlertDialog.Builder quitEditDialog(final int position){
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Quit ?");
-        alert.setMessage("You are about to quit edit mode.\nIf lyrics have been edited, the changes will not be saved. Would you like to exit edit mode ?");
-
-        alert.setPositiveButton("Quit without saving", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                mCurrentSection = -1;
-                selectTab(position);
-            }
-        });
-
-        alert.setNeutralButton("Cancel", new DialogInterface.OnClickListener() { // define the 'Cancel' button
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-
-        alert.setNegativeButton("Save and quit", new DialogInterface.OnClickListener() { // define the 'Cancel' button
-            public void onClick(DialogInterface dialog, int which) {
-                if(mCurrentFragment instanceof EditSong)
-                    updateSong(((EditSong) mCurrentFragment).getSongLyricsFromUI());
-                dialog.cancel();
-            }
-        });
-        return alert;
-    }
-
-    private AlertDialog.Builder deleteDialog(final SongLyrics songLyrics){
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Delete ?");
-        alert.setMessage("Delete '"+songLyrics.getTitle()+"' from your lyrics ?");
-
-        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
-                ref = ref.child(songLyrics.getId());
-                ref.removeValue(new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        Toast.makeText(getApplication(), "'"+songLyrics.getTitle()+"' has been deleted !", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                });
-            }
-        });
-
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        return alert;
+    public void playSongAtPosition(int position){
+        mMusicPlayer.playMedia(position);
     }
 }
+// 580 / 510 / 455

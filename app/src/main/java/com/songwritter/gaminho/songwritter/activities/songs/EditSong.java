@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
@@ -71,10 +72,18 @@ public class EditSong extends Fragment {
         int id = item.getItemId();
 
         if(id == R.id.action_save){
-            mListener.updateSong(getSongLyricsFromUI());
+            if(needUpdate())
+                mListener.updateSong(getSongLyricsFromUI());
+            else
+                Toast.makeText(getContext(), getString(R.string.no_update), Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean needUpdate(){
+        return !getSongLyricsFromUI().getTitle().equals(mListener.getSongLyrics().getTitle())
+                || !getSongLyricsFromUI().getContent().equals(mListener.getSongLyrics().getContent());
     }
 
     // Utils

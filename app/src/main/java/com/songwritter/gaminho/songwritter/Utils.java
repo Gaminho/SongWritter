@@ -3,6 +3,7 @@ package com.songwritter.gaminho.songwritter;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -11,23 +12,16 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.provider.OpenableColumns;
-import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -166,4 +160,34 @@ public class Utils {
             }
         }
     }
+
+    public static void setImageView(int resId, ImageView imageView){
+        Bitmap bitmap = BitmapFactory.decodeResource(imageView.getContext().getResources(), resId);
+        int height = (bitmap.getHeight() * 512 / bitmap.getWidth());
+        Bitmap scale = Bitmap.createScaledBitmap(bitmap, 512, height, true);
+        imageView.setImageBitmap(scale);
+    }
+
+
+
+
+    // Format
+    public static String milliSecondsToTimer(long milliseconds){
+
+        int hours = (int)( milliseconds / (1000*60*60));
+        int minutes = (int)(milliseconds % (1000*60*60)) / (1000*60);
+        int seconds = (int) ((milliseconds % (1000*60*60)) % (1000*60) / 1000);
+
+        return hours > 0 ? String.format(Locale.FRANCE, "%d:%02d:%02d", hours, minutes, seconds)
+                : String.format(Locale.FRANCE, "%d:%02d", minutes, seconds);
+    }
+
+    public static int getProgressPercentage(long currentDuration, long totalDuration){
+        long currentSeconds = (int) (currentDuration / 1000);
+        long totalSeconds = (int) (totalDuration / 1000);
+
+        Double percentage =(((double)currentSeconds)/totalSeconds)*100;
+        return percentage.intValue();
+    }
+
 }

@@ -52,6 +52,7 @@
                         android:text="@string/example_lyrics_title"
                         android:textColor="@color/black0"
                         android:lines="1"
+                        android:textStyle="bold"
                         android:ellipsize="marquee"
                         android:textSize="18dp" />
 
@@ -64,6 +65,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/example_lyrics_creation"
                         android:textColor="@color/black0"
+                        android:textStyle="bold"
                         android:textSize="16dp" />
 
                 </RelativeLayout>

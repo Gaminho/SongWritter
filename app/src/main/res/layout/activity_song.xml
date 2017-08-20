@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
-        android:id="@+id/top_songs"
-        layout="@layout/top_actions"/>
+    <com.songwritter.gaminho.songwritter.customviews.MyActionBar
+        android:id="@+id/actionBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:counter="5"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,6 +26,13 @@
             android:id="@+id/song_fragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <com.songwritter.gaminho.songwritter.customviews.MusicPlayer
+            android:id="@+id/music_player"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

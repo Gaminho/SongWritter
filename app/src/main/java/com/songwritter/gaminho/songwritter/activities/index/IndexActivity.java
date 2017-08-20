@@ -5,7 +5,6 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -240,12 +239,12 @@ public class IndexActivity extends AppCompatActivity
         ImageView usrPix = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.user_pix);
         TextView headerMsg = (TextView) navigationView.getHeaderView(0).findViewById(R.id.connectedAs);
         int cardViewColor;
-        Drawable cardViewPix;
-        usrPix.setImageDrawable(getDrawable(R.drawable.android));
+        int cardViewPixId;
+        Utils.setImageView(R.drawable.android, usrPix);
 
         if (user != null) {
             cardViewColor = getColor(R.color.red500);
-            cardViewPix = getDrawable(R.drawable.signout);
+            cardViewPixId = R.drawable.signout;
             if (user.getDisplayName() != null)
                 headerMsg.setText(String.format(Locale.FRANCE, getString(R.string.format_connected_as), user.getDisplayName()));
             else
@@ -257,7 +256,7 @@ public class IndexActivity extends AppCompatActivity
         } else {
             headerMsg.setText(getString(R.string.state_not_connected));
             cardViewColor = getColor(R.color.green500);
-            cardViewPix = getDrawable(R.drawable.signin);
+            cardViewPixId = R.drawable.signin;
         }
 
         // Handle Menu Sections
@@ -267,7 +266,7 @@ public class IndexActivity extends AppCompatActivity
 
         // CardView
         ((CardView) navigationView.getHeaderView(0).findViewById(R.id.sign_out)).setCardBackgroundColor(cardViewColor);
-        signPix.setImageDrawable(cardViewPix);
+        Utils.setImageView(cardViewPixId, signPix);
 
         navigationView.getHeaderView(0).findViewById(R.id.sign_out).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -341,18 +340,6 @@ public class IndexActivity extends AppCompatActivity
     public Uri getUserImg() {
         String uri = mSharedPreferences.getString(Utils.PREF_USER_PROFILE_URI, null);
         return uri != null ? Uri.parse(uri) : null;
-    }
-
-    private String heyhey;
-
-    @Override
-    public void setText(String text) {
-        heyhey = text;
-    }
-
-    @Override
-    public String getText() {
-        return heyhey;
     }
 
     @Override
@@ -514,7 +501,7 @@ public class IndexActivity extends AppCompatActivity
             view.findViewById(R.id.create_account).setVisibility(View.GONE);
             bLogIn.setText(getText(R.string.btn_sign_in));
         }
-
+        
         return alert;
     }
 

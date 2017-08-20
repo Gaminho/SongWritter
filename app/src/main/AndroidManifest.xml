@@ -29,7 +29,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activities.songs.ActivitySong"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:configChanges="keyboardHidden|orientation"/>
     </application>
 
 </manifest>

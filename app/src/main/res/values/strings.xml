@@ -23,10 +23,14 @@
     <string name="nav_msg">Mes messages</string>
 
     <!-- Example values-->
+    <string name="example_beat_title">Polnatrap</string>
+    <string name="example_beat_author">Musashi</string>
+    <string name="example_beat_details">Face A</string>
     <string name="example_lyrics_title">Vox Agora</string>
     <string name="example_lyrics_content">Noir kawa, à la Néron débute, élevé sur des terres occultes où les démons exultent</string>
     <string name="example_lyrics_creation">15/08/2017</string>
     <string name="example_lyrics_update">10h55:42</string>
+    <string name="example_song_current_second">0:00</string>
 
     <!-- Hints -->
     <string name="hint_mail">Adresse mail</string>
@@ -35,7 +39,6 @@
 
 
     <!-- Button -->
-    <string name="btn_cancel">Cancel</string>
     <string name="btn_log_in">Log in</string>
     <string name="btn_sign_in">Sign in</string>
     <string name="btn_add_beat">Add a beat</string>
@@ -51,14 +54,53 @@
     <string name="format_last_update">Modif. %s</string>
     <string name="format_songs_count">%d textes</string>
     <string name="format_songs_beats_count">%d beats</string>
+    <string name="format_delete_song">Remove \'%s\' from your lyrics ?</string>
+    <string name="format_has_been_updated">\'%s\' has been updated</string>
+    <string name="format_has_been_saved">\'%s\' has been saved</string>
+    <string name="format_has_been_deleted">\'%s\' has been deleted !"</string>
+    <string name="format_beat_has_been_added">\'%s\' has been added to your beats</string>
 
     <!-- Loadings -->
     <string name="loading_songs">Récupération de vos textes</string>
 
-
-
     <!-- No Content -->
     <string name="no_beats">Pas de beats pour ce morceau</string>
     <string name="no_account">Créer un compte</string>
+    <string name="no_update">Aucune modification</string>
+    <string name="no_playlist">No playlist</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_title_warning">Warning</string>
+    <string name="dialog_title_save_beat">Add beat</string>
+    <string name="dialog_title_media_playing">Media is still playing</string>
+    <string name="dialog_continue_playing">Continue playing ?</string>
+    <string name="dialog_save_modification">Save modifications ?</string>
+    <string name="dialog_quit_without_saving">Quit without saving</string>
+    <string name="dialog_save_and_quit">Save and quit</string>
+    <string name="dialog_stop_playing">Stop playing</string>
+
+
+
+    <!--Generic-->
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="confirm">Confirm</string>
+    <string name="no">No</string>
+    <string name="save">Save</string>
+    <string name="file_not_found">File not found!</string>
+
+
+
+    <!--Song-->
+    <string name="from_youtube">From YouTube</string>
+    <string name="from_local_storage">From locale storage</string>
+
+    <string-array name="song_sections">
+        <item>Paroles</item>
+        <item>Modifier</item>
+        <item>Musiques</item>
+        <item>Records</item>
+        <item>Partager</item>
+    </string-array>
 
 </resources>
