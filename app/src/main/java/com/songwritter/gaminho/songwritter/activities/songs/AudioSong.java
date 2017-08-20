@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -31,13 +32,16 @@ import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+
+import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
 
 public class AudioSong extends Fragment {
 
     // Intent Result
     private final static int GET_AUDIO = 99;
+
+    private ListView mLVBeats;
 
     @Nullable
     private
@@ -59,33 +63,23 @@ public class AudioSong extends Fragment {
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.song_audio, container, false);
 
-        final TextView tvLyrics = (TextView) view.findViewById(R.id.song_audio);
-        ListView mLVBeats = (ListView) view.findViewById(R.id.beats_list);
+        final TextView tvLyrics = (TextView) view.findViewById(R.id.no_beat);
+        mLVBeats = (ListView) view.findViewById(R.id.beats_list);
 
         if (!mListBeats.isEmpty()) {
-            tvLyrics.setText(String.format(Locale.FRANCE, getString(R.string.format_songs_beats_count), mListBeats.size()));
-            mLVBeats.setAdapter(new InstrumentalAdapter(getActivity(), mListBeats));
-            mLVBeats.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    if(new File(mListBeats.get(position).getPath()).exists()) {
-                        if(getActivity() instanceof ActivitySong)
-                            ((ActivitySong) getActivity()).playSongAtPosition(position);
-                    }
-                    else{
-                        Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            tvLyrics.setVisibility(View.GONE);
+            mLVBeats = setUpListView(mLVBeats);
         } else {
+            tvLyrics.setVisibility(View.VISIBLE);
+            mLVBeats.setVisibility(View.GONE);
             tvLyrics.setText(getString(R.string.no_beats));
-            tvLyrics.setTextColor(getContext().getColor(R.color.red500));
         }
 
         return view;
@@ -143,6 +137,39 @@ public class AudioSong extends Fragment {
         }
     }
 
+    // Set up view
+    private ListView setUpListView(ListView listView){
+        listView.setVisibility(View.VISIBLE);
+        listView.setAdapter(new InstrumentalAdapter(getActivity(), mListBeats));
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                    if(new File(mListBeats.get(position).getPath()).exists()) {
+                        if(getActivity() instanceof ActivitySong) {
+                            ActivitySong activity = (ActivitySong) getActivity();
+                            if (activity.getCurrentPosition() != position) {
+                                activity.playSongAtPosition(position);
+                            } else {
+                                if (!activity.isPlaying()) {
+                                    if (activity.inPause())
+                                        activity.resumeSong();
+                                    else
+                                        activity.playSongAtPosition(position);
+                                } else {
+                                    activity.pauseSongAtPosition(position);
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        return listView;
+    }
+
+
     //Dialog
 
     private AlertDialog.Builder addBeatDialog(){
@@ -181,14 +208,22 @@ public class AudioSong extends Fragment {
         final EditText etBeatName = (EditText) view.findViewById(R.id.beat_title);
         etBeatName.setText(file.getName());
 
-        final int FACE_A = 1;
+        final EditText etBeatAuthor = (EditText) view.findViewById(R.id.beat_author);
 
         builder.setPositiveButton(getString(R.string.save), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Instrumental.Type typeBeat = rgTypeBeat.getCheckedRadioButtonId() == FACE_A ? Instrumental.Type.FACE_A : Instrumental.Type.FACE_B;
-                Instrumental instrumental = new Instrumental(file.getPath(), etBeatName.getText().toString(), typeBeat);
+                Instrumental.Type typeBeat = null;
+                if (rgTypeBeat.getCheckedRadioButtonId() == R.id.rb_face_a) {
+                    typeBeat = Instrumental.Type.FACE_A;
+                }
+                else if (rgTypeBeat.getCheckedRadioButtonId() == R.id.rb_face_b){
+                    typeBeat = Instrumental.Type.FACE_B;
+                }
+
+                Instrumental instrumental = new Instrumental(etBeatName.getText().toString(),
+                        file.getPath(), typeBeat, etBeatAuthor.getText().toString());
                 if(isInstrumentalValid(instrumental)) {
                     mListener.addABeat(instrumental);
                     dialog.dismiss();
@@ -207,17 +242,22 @@ public class AudioSong extends Fragment {
 
     private boolean isInstrumentalValid(Instrumental instrumental){
         if(instrumental.getPath() == null || instrumental.getPath().isEmpty()){
-            Toast.makeText(getActivity(), "Path can not be null!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.null_path), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         else if(instrumental.getTitle() == null || instrumental.getTitle().isEmpty()){
-            Toast.makeText(getActivity(), "Title can not be null!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.null_title), Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        else if(instrumental.getAuthor() == null || instrumental.getAuthor().isEmpty()){
+            Toast.makeText(getActivity(), getString(R.string.null_author), Toast.LENGTH_SHORT).show();
             return false;
         }
 
         else if(instrumental.getType() == null){
-            Toast.makeText(getActivity(), "Type can not be null!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.null_type), Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -225,4 +265,27 @@ public class AudioSong extends Fragment {
             return true;
     }
 
+    public void updatePauseUI(int mediaPosition){
+        assert  mLVBeats != null;
+        ImageView imV = (ImageView) mLVBeats.getChildAt(mediaPosition).findViewById(R.id.play_pause_stop);
+        Utils.setImageView(R.drawable.ic_play_arrow_white_18dp, imV);
+    }
+
+    public void updatePlayUI(int mediaPosition){
+        assert  mLVBeats != null;
+        ImageView imV;
+        int resId;
+        LOG("Child: " + mLVBeats.getChildCount());
+        for(int i = 0 ; i < mLVBeats.getChildCount() ; i++){
+            imV = (ImageView) mLVBeats.getChildAt(i).findViewById(R.id.play_pause_stop);
+            if(i != mediaPosition){
+                resId = R.drawable.ic_play_arrow_white_18dp;
+            }
+            else{
+                resId = R.drawable.ic_pause_white_18dp;
+                LOG("That's the position!");
+            }
+            Utils.setImageView(resId, imV);
+        }
+    }
 }

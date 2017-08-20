@@ -32,20 +32,20 @@ public class MusicPlayer extends LinearLayout implements
     /*
     // check for repeat is ON or OFF
         if(isRepeat){
-            // repeat is on play same song again
+            // repeat is on updatePlayUI same song again
             playSong(currentSongIndex);
         } else if(isShuffle){
-            // shuffle is on - play a random song
+            // shuffle is on - updatePlayUI a random song
             Random rand = new Random();
             currentSongIndex = rand.nextInt((mListBeats.size() - 1) - 0 + 1) + 0;
             playSong(currentSongIndex);
         } else{
-            // no repeat or shuffle ON - play next song
+            // no repeat or shuffle ON - updatePlayUI next song
             if(currentSongIndex < (mListBeats.size() - 1)){
                 playSong(currentSongIndex + 1);
                 currentSongIndex = currentSongIndex + 1;
             }else{
-                // play first song
+                // updatePlayUI first song
                 playSong(0);
                 currentSongIndex = 0;
             }
@@ -73,6 +73,8 @@ public class MusicPlayer extends LinearLayout implements
     private List<Instrumental> mMedias;
 
     private int currentMediaPosition;
+
+    private boolean isPausing;
 
     public MusicPlayer(Context context) {
         super(context);
@@ -107,6 +109,14 @@ public class MusicPlayer extends LinearLayout implements
 
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(this);
+
+
+        if (context instanceof MusicPlayerListener) {
+            mListener = (MusicPlayerListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MusicPlayerListener");
+        }
     }
 
     public void setPlaylist(List<Instrumental> medias){
@@ -125,6 +135,10 @@ public class MusicPlayer extends LinearLayout implements
         return this.mPlayer != null && this.mPlayer.isPlaying();
     }
 
+    public boolean isPause(){
+        return this.mPlayer != null && isPausing;
+    }
+
     public void playMedia(int mediaPosition){
         if(mMedias!= null && !mMedias.isEmpty()) {
             if (mediaPosition < getPlaylistSize() && mediaPosition >= 0) {
@@ -137,9 +151,16 @@ public class MusicPlayer extends LinearLayout implements
         }
     }
 
+    public void pauseMedia(int mediaPosition) {
+        if (mediaPosition < getPlaylistSize() && mediaPosition >= 0) {
+            pause();
+        }
+    }
+
     @Override
     public void play(Instrumental beat) {
 
+        isPausing = false;
         mPlayer.reset();
         try {
             mPlayer.setDataSource(beat.getPath());
@@ -166,17 +187,22 @@ public class MusicPlayer extends LinearLayout implements
         mPlayer.start();
 
         updateProgressBar();
+        mListener.playPressed(currentMediaPosition);
     }
 
     @Override
     public void pause() {
         mPlayer.pause();
+        isPausing = true;
+        mListener.pausePressed(currentMediaPosition);
         Utils.setImageView(R.drawable.ic_play_arrow_white_18dp, mIVPlayPause);
     }
 
     @Override
     public void resume() {
         mPlayer.start();
+        isPausing = false;
+        mListener.playPressed(currentMediaPosition);
         Utils.setImageView(R.drawable.ic_pause_white_18dp, mIVPlayPause);
     }
 
@@ -184,6 +210,8 @@ public class MusicPlayer extends LinearLayout implements
     public void stop() {
         mPlayer.stop();
         mHandler.removeCallbacks(mUpdateTimeTask);
+        mRootView.setVisibility(GONE);
+        Utils.setImageView(R.drawable.ic_play_arrow_white_18dp, mIVPlayPause);
     }
 
     @Override
@@ -281,4 +309,13 @@ public class MusicPlayer extends LinearLayout implements
 
         return true;
     }
+
+
+    MusicPlayerListener mListener;
+
+    public interface MusicPlayerListener {
+        void pausePressed(int mediaPosition);
+        void playPressed(int mediaPosition);
+    }
+
 }

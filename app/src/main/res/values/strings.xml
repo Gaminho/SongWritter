@@ -87,7 +87,11 @@
     <string name="confirm">Confirm</string>
     <string name="no">No</string>
     <string name="save">Save</string>
-    <string name="file_not_found">File not found!</string>
+    <string name="file_not_found">File not found</string>
+    <string name="null_title">Title can not be null</string>
+    <string name="null_author">Author can not be null</string>
+    <string name="null_path">Path can not be null</string>
+    <string name="null_type">Type can not be null</string>
 
 
 

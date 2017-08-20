@@ -11,22 +11,24 @@ public class Instrumental implements Serializable {
     private String path;
     private String title;
     private Type type;
+    private String author;
 
     public Instrumental() {
     }
 
-    public Instrumental(String path, String title, Type type) {
+    public Instrumental(String title, String path, Type type, String author) {
+        this.title = title;
         this.path = path;
         this.type = type;
-        this.title = title;
+        this.author = author;
     }
 
-    public String getPath() {
-        return path;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public Type getType() {
@@ -35,6 +37,14 @@ public class Instrumental implements Serializable {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getTitle() {
@@ -49,8 +59,10 @@ public class Instrumental implements Serializable {
     public String toString() {
         return "Instrumental{" +
                 "path='" + path + '\'' +
-                ", type='" + type + '\'' +
                 ", title='" + title + '\'' +
+                ", type=" + type +
+                ", author='" + author + '\'' +
                 '}';
     }
+
 }

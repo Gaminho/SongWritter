@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class ActivitySong extends AppCompatActivity implements SongInteractionListener {
+public class ActivitySong extends AppCompatActivity implements SongInteractionListener,
+        MusicPlayer.MusicPlayerListener {
 
     private static final int SECTION_VIEW = 0;
     private static final int SECTION_EDIT = 1;
@@ -445,8 +446,45 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
         });
     }
 
+    // Utils
+
     public void playSongAtPosition(int position){
         mMusicPlayer.playMedia(position);
+    }
+
+    public void pauseSongAtPosition(int position){
+        mMusicPlayer.pauseMedia(position);
+    }
+
+    public void resumeSong(){
+        mMusicPlayer.resume();
+    }
+
+    public boolean isPlaying(){
+        return mMusicPlayer != null && mMusicPlayer.isPlaying();
+    }
+
+    public boolean inPause(){
+        return mMusicPlayer != null && mMusicPlayer.isPause();
+    }
+
+    public int getCurrentPosition(){
+        assert mMusicPlayer != null;
+        return mMusicPlayer.getCurrentMediaPosition();
+    }
+
+    @Override
+    public void pausePressed(int mediaPosition) {
+        Fragment f = getFragmentManager().findFragmentById(R.id.song_fragment);
+        if (f instanceof AudioSong)
+            ((AudioSong) f).updatePauseUI(mediaPosition);
+    }
+
+    @Override
+    public void playPressed(int mediaPosition) {
+        Fragment f = getFragmentManager().findFragmentById(R.id.song_fragment);
+        if (f instanceof AudioSong)
+            ((AudioSong) f).updatePlayUI(mediaPosition);
     }
 }
 // 580 / 510 / 455

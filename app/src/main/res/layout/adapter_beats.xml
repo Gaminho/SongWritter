@@ -25,15 +25,17 @@
 
                 <ImageView
                     android:id="@+id/play_pause_stop"
-                    android:src="@drawable/ic_play_circle_filled_white_18dp"
+                    android:src="@drawable/ic_play_arrow_white_18dp"
                     android:layout_width="match_parent"
+                    android:tint="@color/white0"
                     android:layout_height="match_parent"
-                    android:padding="10dp"/>
+                    android:padding="8dp"/>
 
             </RelativeLayout>
 
             <LinearLayout
-                android:layout_toRightOf="@+id/music_action"
+                android:layout_toEndOf="@+id/music_action"
+                android:layout_toStartOf="@+id/beat_shared"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
@@ -51,13 +53,31 @@
                     android:ellipsize="marquee"
                     android:textSize="16dp" />
 
-                <TextView
-                    android:id="@+id/beat_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="bottom"
-                    android:text="@string/example_beat_details" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/beat_author"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:lines="1"
+                        android:ellipsize="marquee"
+                        android:text="@string/example_beat_author" />
+
+                    <TextView
+                        android:id="@+id/beat_details"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:lines="1"
+                        android:textColor="@color/black0"
+                        android:gravity="end"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/example_beat_details" />
+
+                </LinearLayout>
 
             </LinearLayout>
 

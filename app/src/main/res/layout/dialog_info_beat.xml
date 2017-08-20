@@ -34,12 +34,15 @@
         android:orientation="horizontal">
 
         <RadioButton
+            android:id="@+id/rb_face_a"
+            android:checked="true"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Face A"/>
 
         <RadioButton
+            android:id="@+id/rb_face_b"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
