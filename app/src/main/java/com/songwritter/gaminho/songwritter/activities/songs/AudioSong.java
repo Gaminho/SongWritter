@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,12 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static com.songwritter.gaminho.songwritter.Utils.LOG;
-
 
 public class AudioSong extends Fragment {
 
-    // Intent Result
     private final static int GET_AUDIO = 99;
 
     private ListView mLVBeats;
@@ -60,7 +58,6 @@ public class AudioSong extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LOG("onResume fragment");
         TextView tvLyrics = (TextView) getView().findViewById(R.id.no_beat);
 
         if (!mListBeats.isEmpty()) {
@@ -79,7 +76,6 @@ public class AudioSong extends Fragment {
 
         List<Instrumental> beats = mListener.getSongLyrics().getBeats();
         mListBeats = beats != null ? beats : new ArrayList<Instrumental>();
-
         setHasOptionsMenu(true);
     }
 
@@ -89,8 +85,6 @@ public class AudioSong extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.song_audio, container, false);
-
-        //final TextView tvLyrics = (TextView) view.findViewById(R.id.no_beat);
         mLVBeats = (ListView) view.findViewById(R.id.beats_list);
 
         return view;
@@ -158,34 +152,36 @@ public class AudioSong extends Fragment {
         listView.setVisibility(View.VISIBLE);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    if (!isSelecting()) {
-                        if (new File(mListBeats.get(position).getPath()).exists()) {
-                            if (getActivity() instanceof ActivitySong) {
-                                ActivitySong activity = (ActivitySong) getActivity();
-                                if (activity.getCurrentPosition() != position) {
-                                    activity.playSongAtPosition(position);
-                                } else {
-                                    if (!activity.isPlaying()) {
-                                        if (activity.inPause())
-                                            activity.resumeSong();
-                                        else
-                                            activity.playSongAtPosition(position);
-                                    } else {
-                                        activity.pauseSongAtPosition(position);
-                                    }
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                if (!isSelecting()) {
+                    if (new File(mListBeats.get(position).getPath()).exists()) {
+                        if (getActivity() instanceof ActivitySong) {
+                            ActivitySong activity = (ActivitySong) getActivity();
+                            if (activity.getCurrentPosition() != position) {
+                                activity.playSongAtPosition(position);
+                            }
+                            else {
+                                if (!activity.isPlaying()) {
+                                    if (activity.inPause())
+                                        activity.resumeSong();
+                                    else
+                                        activity.playSongAtPosition(position);
+                                }
+                                else {
+                                    activity.pauseSongAtPosition(position);
                                 }
                             }
-                        } else {
-                            Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        // add or remove selection for current list item
-                        onListItemSelect(position);
+                        Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
                     }
                 }
-            });
+                else {
+                    onListItemSelect(position);
+                }
+            }
+        });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
@@ -234,7 +230,7 @@ public class AudioSong extends Fragment {
 
         alert.setNeutralButton(getString(R.string.cancel), new DialogInterface.OnClickListener() { // define the 'Cancel' button
             public void onClick(DialogInterface dialog, int which) {
-               dialog.dismiss();
+                dialog.dismiss();
             }
         });
 
@@ -336,15 +332,13 @@ public class AudioSong extends Fragment {
 
     public void updatePauseUI(int mediaPosition){
         assert  mLVBeats != null;
-        ImageView imV = (ImageView) mLVBeats.getChildAt(mediaPosition).findViewById(R.id.play_pause_stop);
-        Utils.setImageView(R.drawable.ic_play_arrow_white_18dp, imV);
+        Utils.setImageView(R.drawable.ic_play_arrow_white_18dp, (ImageView) mLVBeats.getChildAt(mediaPosition).findViewById(R.id.play_pause_stop));
     }
 
     public void updatePlayUI(int mediaPosition){
         assert  mLVBeats != null;
         ImageView imV;
         int resId;
-        LOG("Child: " + mLVBeats.getChildCount());
         for(int i = 0 ; i < mLVBeats.getChildCount() ; i++){
             imV = (ImageView) mLVBeats.getChildAt(i).findViewById(R.id.play_pause_stop);
             if(i != mediaPosition){
@@ -352,7 +346,6 @@ public class AudioSong extends Fragment {
             }
             else{
                 resId = R.drawable.ic_pause_white_18dp;
-                LOG("That's the position!");
             }
             Utils.setImageView(resId, imV);
         }
@@ -364,27 +357,16 @@ public class AudioSong extends Fragment {
 
     private void onListItemSelect(int position) {
         mAdapter.toggleSelection(position);
-        boolean hasCheckedItems = mAdapter.getSelectedCount() > 0;
-
-        if (hasCheckedItems) {
-            mAdapter.setSelectionMod(true);
-        }
-        else {
-            mAdapter.setSelectionMod(false);
-        }
+        mAdapter.setSelectionMod(mAdapter.getSelectedCount() > 0);
         getActivity().invalidateOptionsMenu();
     }
 
     public List<Instrumental> getSelectedBeats(){
         List<Instrumental> list = new ArrayList<>();
-        mAdapter.getSelectedIds();
-        LOG(mAdapter.getSelectedIds().size() + " : taille");
-        for (int i = (mAdapter.getSelectedIds().size() - 1); i >= 0; i--) {
-            LOG("Index: " + i);
-            if (mAdapter.getSelectedIds().valueAt(i)) {
-                LOG("Item: " + mAdapter.getSelectedIds().valueAt(i));
-                Instrumental selectedItem = mAdapter.getItem(mAdapter.getSelectedIds().keyAt(i));
-                LOG("Beat: " + mAdapter.getSelectedIds().valueAt(i));
+        SparseBooleanArray sparseBooleanArray = mAdapter.getSelectedIds();
+        for (int i = (sparseBooleanArray.size() - 1); i >= 0; i--) {
+            if (sparseBooleanArray.valueAt(i)) {
+                Instrumental selectedItem = mAdapter.getItem(sparseBooleanArray.keyAt(i));
                 mAdapter.remove(selectedItem);
                 list.add(selectedItem);
             }

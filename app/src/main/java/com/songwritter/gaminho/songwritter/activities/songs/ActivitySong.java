@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static com.songwritter.gaminho.songwritter.Utils.LOG;
-
 public class ActivitySong extends AppCompatActivity implements SongInteractionListener,
         MusicPlayer.MusicPlayerListener {
 
@@ -157,7 +155,7 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
     @Override
     protected void onStop() {
         super.onStop();
-        if(mMusicPlayer != null && mMusicPlayer.isPlaying())
+        if(isPlaying())
             mMusicPlayer.stop();
     }
 
@@ -456,9 +454,9 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
         for(Instrumental beat : beatsToRemove)
             namesToRemove.add(beat.getTitle());
 
-        for (int i = 0 ; i < getSongLyrics().getBeats().size() ; i++){
-            if(!namesToRemove.contains(getSongLyrics().getBeats().get(i).getTitle()))
-                newList.add(getSongLyrics().getBeats().get(i));
+        for(Instrumental beat : getSongLyrics().getBeats()){
+            if(!namesToRemove.contains(beat.getTitle()))
+                newList.add(beat);
         }
 
         mSongLyrics.setId(null);
@@ -475,8 +473,6 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
                 mPBSongs.setVisibility(View.GONE);
                 if (databaseError != null) {
                     Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplication(), String.format(Locale.FRANCE, getString(R.string.format_has_been_updated), "Beats"), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -485,7 +481,6 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
             File file = new File(beat.getPath());
             if(file.exists()) {
                 file.delete();
-                LOG(beat.getTitle() + " has been deleted!");
             }
         }
 
@@ -533,4 +528,3 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
     }
 
 }
-// 580 / 510 / 455
