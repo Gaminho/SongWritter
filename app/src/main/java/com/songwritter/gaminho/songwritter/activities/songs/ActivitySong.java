@@ -301,33 +301,30 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
         return builder;
     }
 
-    private CustomAlertDialogBuilder backWhilePlayingDialog(final int position){
-        CustomAlertDialogBuilder builder = new CustomAlertDialogBuilder(this);
-        builder.setTitle(getString(R.string.dialog_title_media_playing));
-        builder.setMessage(getString(R.string.dialog_continue_playing));
+    private AlertDialog.Builder backWhilePlayingDialog(final int position){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(getString(R.string.dialog_title_media_playing));
+        alert.setMessage(getString(R.string.dialog_continue_playing));
 
-        builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+            public void onClick(DialogInterface dialog, int which) {
                 mCurrentSection = -1;
                 mActionBar.click(position);
             }
         });
 
-        builder.setNeutralButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        alert.setNeutralButton(getString(R.string.cancel), null);
 
-        builder.setNegativeButton(getString(R.string.dialog_stop_playing), new DialogInterface.OnClickListener() { // define the 'Cancel' button
+        alert.setNegativeButton(getString(R.string.dialog_stop_playing), new DialogInterface.OnClickListener() { // define the 'Cancel' button
             public void onClick(DialogInterface dialog, int which) {
                 mMusicPlayer.stop();
                 mCurrentSection = -1;
                 mActionBar.click(position);
+                dialog.dismiss();
             }
         });
-        return builder;
+        return alert;
     }
 
     private AlertDialog.Builder deleteDialog(final SongLyrics songLyrics){
