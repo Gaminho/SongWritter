@@ -58,6 +58,22 @@ public class AudioSong extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        LOG("onResume fragment");
+        TextView tvLyrics = (TextView) getView().findViewById(R.id.no_beat);
+
+        if (!mListBeats.isEmpty()) {
+            tvLyrics.setVisibility(View.GONE);
+            mLVBeats = setUpListView(mLVBeats);
+        } else {
+            tvLyrics.setVisibility(View.VISIBLE);
+            mLVBeats.setVisibility(View.GONE);
+            tvLyrics.setText(getString(R.string.no_beats));
+        }
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -74,17 +90,8 @@ public class AudioSong extends Fragment {
 
         View view = inflater.inflate(R.layout.song_audio, container, false);
 
-        final TextView tvLyrics = (TextView) view.findViewById(R.id.no_beat);
+        //final TextView tvLyrics = (TextView) view.findViewById(R.id.no_beat);
         mLVBeats = (ListView) view.findViewById(R.id.beats_list);
-
-        if (!mListBeats.isEmpty()) {
-            tvLyrics.setVisibility(View.GONE);
-            mLVBeats = setUpListView(mLVBeats);
-        } else {
-            tvLyrics.setVisibility(View.VISIBLE);
-            mLVBeats.setVisibility(View.GONE);
-            tvLyrics.setText(getString(R.string.no_beats));
-        }
 
         return view;
     }
@@ -221,6 +228,7 @@ public class AudioSong extends Fragment {
                 mAdapter.removeSelection();
                 mAdapter.setSelectionMod(false);
                 getActivity().invalidateOptionsMenu();
+                onResume();
             }
         });
 
