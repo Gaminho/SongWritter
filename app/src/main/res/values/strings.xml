@@ -78,6 +78,8 @@
     <string name="dialog_quit_without_saving">Quit without saving</string>
     <string name="dialog_save_and_quit">Save and quit</string>
     <string name="dialog_stop_playing">Stop playing</string>
+    <string name="dialog_remove_beats">Renove beat</string>
+
 
 
 

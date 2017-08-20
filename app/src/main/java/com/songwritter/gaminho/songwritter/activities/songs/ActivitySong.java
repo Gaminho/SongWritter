@@ -25,11 +25,14 @@ import com.songwritter.gaminho.songwritter.customviews.MusicPlayer;
 import com.songwritter.gaminho.songwritter.customviews.MyActionBar;
 import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
 public class ActivitySong extends AppCompatActivity implements SongInteractionListener,
         MusicPlayer.MusicPlayerListener {
@@ -116,10 +119,10 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.action_delete)
-            deleteSong(mSongLyrics);
+//        int id = item.getItemId();
+//
+//        if(id == R.id.action_delete)
+//            deleteSong(mSongLyrics);
 
         return super.onOptionsItemSelected(item);
     }
@@ -139,10 +142,9 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
             }
         }
         else if (mCurrentSection == SECTION_MUSIC){
-            if(mMusicPlayer != null && mMusicPlayer.isPlaying()) {
+            if (mMusicPlayer != null && mMusicPlayer.isPlaying()) {
                 backWhilePlayingDialog(SECTION_VIEW).show();
-            }
-            else{
+            } else {
                 mCurrentSection = -1;
                 mActionBar.click(SECTION_VIEW);
             }
@@ -446,6 +448,49 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
         });
     }
 
+    @Override
+    public void removeBeats(List<Instrumental> beatsToRemove) {
+        List<Instrumental> newList = new ArrayList<>();
+
+        List<String> namesToRemove = new ArrayList<>();
+        for(Instrumental beat : beatsToRemove)
+            namesToRemove.add(beat.getTitle());
+
+        for (int i = 0 ; i < getSongLyrics().getBeats().size() ; i++){
+            if(!namesToRemove.contains(getSongLyrics().getBeats().get(i).getTitle()))
+                newList.add(getSongLyrics().getBeats().get(i));
+        }
+
+        mSongLyrics.setId(null);
+        mSongLyrics.setBeats(newList);
+        mSongLyrics.setLastUpdate(System.currentTimeMillis());
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(mSongKey, mSongLyrics);
+        DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+        ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                mPBSongs.setVisibility(View.GONE);
+                if (databaseError != null) {
+                    Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplication(), String.format(Locale.FRANCE, getString(R.string.format_has_been_updated), "Beats"), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        for(Instrumental beat : beatsToRemove){
+            File file = new File(beat.getPath());
+            if(file.exists()) {
+                file.delete();
+                LOG(beat.getTitle() + " has been deleted!");
+            }
+        }
+
+    }
+
     // Utils
 
     public void playSongAtPosition(int position){
@@ -486,5 +531,6 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
         if (f instanceof AudioSong)
             ((AudioSong) f).updatePlayUI(mediaPosition);
     }
+
 }
 // 580 / 510 / 455

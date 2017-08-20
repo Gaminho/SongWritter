@@ -65,4 +65,26 @@ public class Instrumental implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Instrumental that = (Instrumental) o;
+
+        if (!path.equals(that.path)) return false;
+        if (!title.equals(that.title)) return false;
+        if (type != that.type) return false;
+        return author.equals(that.author);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = path.hashCode();
+        result = 31 * result + title.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + author.hashCode();
+        return result;
+    }
 }

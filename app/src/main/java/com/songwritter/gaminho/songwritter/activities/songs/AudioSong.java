@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
@@ -42,6 +44,7 @@ public class AudioSong extends Fragment {
     private final static int GET_AUDIO = 99;
 
     private ListView mLVBeats;
+    private InstrumentalAdapter mAdapter;
 
     @Nullable
     private
@@ -60,6 +63,7 @@ public class AudioSong extends Fragment {
 
         List<Instrumental> beats = mListener.getSongLyrics().getBeats();
         mListBeats = beats != null ? beats : new ArrayList<Instrumental>();
+
         setHasOptionsMenu(true);
     }
 
@@ -93,7 +97,11 @@ public class AudioSong extends Fragment {
             addBeatDialog().show();
         }
 
-        return super.onOptionsItemSelected(item);
+        else if(id == R.id.action_delete) {
+            removeBeatDialog().show();
+        }
+
+        return true;
     }
 
     @Override
@@ -139,38 +147,91 @@ public class AudioSong extends Fragment {
 
     // Set up view
     private ListView setUpListView(ListView listView){
+        mAdapter = new InstrumentalAdapter(getActivity(), R.layout.adapter_beats, mListBeats);
         listView.setVisibility(View.VISIBLE);
-        listView.setAdapter(new InstrumentalAdapter(getActivity(), mListBeats));
+        listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                    if(new File(mListBeats.get(position).getPath()).exists()) {
-                        if(getActivity() instanceof ActivitySong) {
-                            ActivitySong activity = (ActivitySong) getActivity();
-                            if (activity.getCurrentPosition() != position) {
-                                activity.playSongAtPosition(position);
-                            } else {
-                                if (!activity.isPlaying()) {
-                                    if (activity.inPause())
-                                        activity.resumeSong();
-                                    else
-                                        activity.playSongAtPosition(position);
+                    if (!isSelecting()) {
+                        if (new File(mListBeats.get(position).getPath()).exists()) {
+                            if (getActivity() instanceof ActivitySong) {
+                                ActivitySong activity = (ActivitySong) getActivity();
+                                if (activity.getCurrentPosition() != position) {
+                                    activity.playSongAtPosition(position);
                                 } else {
-                                    activity.pauseSongAtPosition(position);
+                                    if (!activity.isPlaying()) {
+                                        if (activity.inPause())
+                                            activity.resumeSong();
+                                        else
+                                            activity.playSongAtPosition(position);
+                                    } else {
+                                        activity.pauseSongAtPosition(position);
+                                    }
                                 }
                             }
+                        } else {
+                            Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
                         }
-                    }
-                    else{
-                        Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+                    } else {
+                        // add or remove selection for current list item
+                        onListItemSelect(position);
                     }
                 }
             });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            public boolean onItemLongClick(AdapterView<?> parent,
+                                           View view, int position, long id) {
+                onListItemSelect(position);
+                return true;
+            }
+        });
+
         return listView;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if(isSelecting()){
+            menu.findItem(R.id.action_delete).setVisible(true);
+            menu.findItem(R.id.action_delete).setTitle(String.format(Locale.FRANCE, "Supprimer (%d)", mAdapter.getSelectedCount()));
+            menu.findItem(R.id.action_save).setVisible(false);
+            menu.findItem(R.id.action_add).setVisible(false);
+        }
+        else{
+            menu.findItem(R.id.action_delete).setVisible(false);
+            menu.findItem(R.id.action_save).setVisible(false);
+            menu.findItem(R.id.action_add).setVisible(true);
+        }
     }
 
 
     //Dialog
+
+    private AlertDialog.Builder removeBeatDialog(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+        alert.setTitle(getString(R.string.dialog_remove_beats));
+
+        alert.setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                mListener.removeBeats(getSelectedBeats());
+                mAdapter.removeSelection();
+                mAdapter.setSelectionMod(false);
+                getActivity().invalidateOptionsMenu();
+            }
+        });
+
+        alert.setNeutralButton(getString(R.string.cancel), new DialogInterface.OnClickListener() { // define the 'Cancel' button
+            public void onClick(DialogInterface dialog, int which) {
+               dialog.dismiss();
+            }
+        });
+
+        return alert;
+    }
 
     private AlertDialog.Builder addBeatDialog(){
         AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
@@ -287,5 +348,39 @@ public class AudioSong extends Fragment {
             }
             Utils.setImageView(resId, imV);
         }
+    }
+
+    public boolean isSelecting(){
+        return mAdapter != null && mAdapter.isSelecting();
+    }
+
+    private void onListItemSelect(int position) {
+        mAdapter.toggleSelection(position);
+        boolean hasCheckedItems = mAdapter.getSelectedCount() > 0;
+
+        if (hasCheckedItems) {
+            mAdapter.setSelectionMod(true);
+        }
+        else {
+            mAdapter.setSelectionMod(false);
+        }
+        getActivity().invalidateOptionsMenu();
+    }
+
+    public List<Instrumental> getSelectedBeats(){
+        List<Instrumental> list = new ArrayList<>();
+        mAdapter.getSelectedIds();
+        LOG(mAdapter.getSelectedIds().size() + " : taille");
+        for (int i = (mAdapter.getSelectedIds().size() - 1); i >= 0; i--) {
+            LOG("Index: " + i);
+            if (mAdapter.getSelectedIds().valueAt(i)) {
+                LOG("Item: " + mAdapter.getSelectedIds().valueAt(i));
+                Instrumental selectedItem = mAdapter.getItem(mAdapter.getSelectedIds().keyAt(i));
+                LOG("Beat: " + mAdapter.getSelectedIds().valueAt(i));
+                mAdapter.remove(selectedItem);
+                list.add(selectedItem);
+            }
+        }
+        return list;
     }
 }
