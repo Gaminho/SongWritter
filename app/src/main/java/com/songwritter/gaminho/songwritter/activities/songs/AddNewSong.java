@@ -90,7 +90,7 @@ public class AddNewSong extends Fragment {
     public boolean isValid(SongLyrics songLyrics){
 
         if(songLyrics.getTitle() == null || songLyrics.getTitle().isEmpty()) {
-            Toast.makeText(getActivity(), "Title can not be null!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.null_title), Toast.LENGTH_SHORT).show();
             return false;
         }
 

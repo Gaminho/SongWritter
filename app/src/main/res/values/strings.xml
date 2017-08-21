@@ -28,7 +28,7 @@
     <string name="example_beat_details">Face A</string>
     <string name="example_lyrics_title">Vox Agora</string>
     <string name="example_lyrics_content">Noir kawa, à la Néron débute, élevé sur des terres occultes où les démons exultent</string>
-    <string name="example_lyrics_creation">15/08/2017</string>
+    <string name="example_date">15/08/2017</string>
     <string name="example_lyrics_update">10h55:42</string>
     <string name="example_song_current_second">0:00</string>
 
@@ -64,7 +64,8 @@
     <string name="loading_songs">Récupération de vos textes</string>
 
     <!-- No Content -->
-    <string name="no_beats">Pas de beats pour ce morceau</string>
+    <string name="no_beats">Pas de beat pour ce morceau</string>
+    <string name="no_records">Pas d\'enregistrement pour ce morceau</string>
     <string name="no_account">Créer un compte</string>
     <string name="no_update">Aucune modification</string>
     <string name="no_playlist">No playlist</string>
@@ -78,7 +79,9 @@
     <string name="dialog_quit_without_saving">Quit without saving</string>
     <string name="dialog_save_and_quit">Save and quit</string>
     <string name="dialog_stop_playing">Stop playing</string>
-    <string name="dialog_remove_beats">Renove beat</string>
+    <string name="dialog_remove_beats">Remove beat</string>
+    <string name="dialog_save_record">Save record</string>
+    <string name="dialog_remove_record">Remove record ?</string>
 
 
 

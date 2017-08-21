@@ -55,7 +55,7 @@ public class Utils {
     }
 
     public enum DateFormat {
-        FULL, DAY, HOUR
+        FULL, DAY, HOUR, FILE_TS
     }
 
     public static String formatTS(long timestamp, DateFormat format){
@@ -70,6 +70,8 @@ public class Utils {
                 return hour;
             case FULL:
                 return String.format(Locale.FRANCE, "%s %s", day, hour);
+            case FILE_TS:
+                return String.format(Locale.FRANCE, "%s_%s", day, hour).replace("/", "_").replace("h","_").replace(":","_");
             default:
                 return null;
         }
@@ -131,33 +133,13 @@ public class Utils {
             filename = returnCursor.getString(nameIndex);
 
             String sourcePath = context.getExternalFilesDir(null).toString();
-
             file = new File(sourcePath + "/beats/");
-            if(!file.exists() && !file.mkdirs()) {
-                return null;
-            }
 
             LOG("Exist: " + file.exists());
-
             file = new File(file, filename);
-            LOG(file.getAbsolutePath());
 
-            try (InputStream is = context.getContentResolver().openInputStream(uri); OutputStream os = new FileOutputStream(file)) {
-                byte[] buffer = new byte[1024];
-                int length;
+            return copyFile(uri, file, context) ? file : null;
 
-                while ((length = is.read(buffer)) > 0) {
-                    os.write(buffer, 0, length);
-                }
-
-                is.close();
-                os.close();
-                return file;
-            } catch (Exception e) {
-                LOG("Exception (retrieveFileFromUri): " + e);
-                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                return null;
-            }
         }
     }
 
@@ -168,8 +150,41 @@ public class Utils {
         imageView.setImageBitmap(scale);
     }
 
+    private static boolean copyFile(Uri uri, File dest, Context context){
+
+        if(!dest.getParentFile().exists() && !dest.getParentFile().mkdirs()) {
+            return false;
+        }
+
+        LOG(dest.getAbsolutePath());
+
+        try (InputStream is = context.getContentResolver().openInputStream(uri); OutputStream os = new FileOutputStream(dest)) {
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+
+            is.close();
+            os.close();
+            return true;
+        } catch (Exception e) {
+            LOG("Exception (retrieveFileFromUri): " + e);
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
 
+    }
+
+    private static boolean copyFile(File src, File dest, Context context){
+        return copyFile(Uri.fromFile(src), dest, context);
+    }
+
+    public static boolean moveFile(File src, File dest, Context context){
+        return copyFile(src, dest, context) && src.delete();
+    }
 
     // Format
     public static String milliSecondsToTimer(long milliseconds){

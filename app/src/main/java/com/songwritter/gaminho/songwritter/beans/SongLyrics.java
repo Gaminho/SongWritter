@@ -13,6 +13,7 @@ public class SongLyrics implements Serializable {
     private long creation;
     private long lastUpdate;
     private List<Instrumental> beats;
+    private List<MemoRecord> memoRecords;
 
     public SongLyrics() {
     }
@@ -50,6 +51,17 @@ public class SongLyrics implements Serializable {
         this.title = title;
         this.content = content;
         this.author = author;
+    }
+
+    public SongLyrics(String id, String title, String content, String author, long creation, long lastUpdate, List<Instrumental> beats, List<MemoRecord> memoRecords) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+        this.creation = creation;
+        this.lastUpdate = lastUpdate;
+        this.beats = beats;
+        this.memoRecords = memoRecords;
     }
 
     public String getTitle() {
@@ -108,6 +120,14 @@ public class SongLyrics implements Serializable {
         this.lastUpdate = lastUpdate;
     }
 
+    public List<MemoRecord> getMemoRecords() {
+        return memoRecords;
+    }
+
+    public void setMemoRecords(List<MemoRecord> memoRecords) {
+        this.memoRecords = memoRecords;
+    }
+
     @Override
     public String toString() {
         return "SongLyrics{" +
@@ -117,6 +137,8 @@ public class SongLyrics implements Serializable {
                 ", author='" + author + '\'' +
                 ", creation=" + creation +
                 ", lastUpdate=" + lastUpdate +
+                ", beats=" + beats +
+                ", memoRecords=" + memoRecords +
                 '}';
     }
 

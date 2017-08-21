@@ -87,4 +87,24 @@ public class Instrumental implements Serializable {
         result = 31 * result + author.hashCode();
         return result;
     }
+
+    public boolean isValid() throws IllegalArgumentException {
+        if(this.getPath() == null || this.getPath().isEmpty())
+            throw  new IllegalArgumentException("Path can not be null");
+
+
+        else if(this.getTitle() == null || this.getTitle().isEmpty())
+            throw  new IllegalArgumentException("Title can not be null");
+
+
+        else if(this.getAuthor() == null || this.getAuthor().isEmpty())
+            throw  new IllegalArgumentException("Author can not be null");
+
+        else if(this.getType() == null)
+            throw  new IllegalArgumentException("Type can not be null");
+
+        return true;
+    }
+
+
 }

@@ -3,4 +3,14 @@
     <declare-styleable name="MyActionBar">
         <attr name="counter" format="integer"/>
     </declare-styleable>
+
+    <declare-styleable name="RecordButton">
+        <attr name="icon_recording" format="integer"/>
+        <attr name="icon_default" format="integer"/>
+        <attr name="tint_recording" format="color"/>
+        <attr name="tint_default" format="color"/>
+        <attr name="btn_color" format="color"/>
+        <attr name="pressed_color" format="color"/>
+    </declare-styleable>
+
 </resources>

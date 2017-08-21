@@ -48,4 +48,15 @@
         <item name="android:layout_alignParentBottom">true</item>
     </style>
 
+    <style name="TopMessage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_alignParentTop">true</item>
+        <item name="android:textColor">@color/white0</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:background">@color/colorPrimaryDarkest</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

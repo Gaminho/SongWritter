@@ -16,6 +16,6 @@
         android:id="@+id/item_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/example_lyrics_creation"/>
+        android:text="@string/example_date"/>
 
 </LinearLayout>

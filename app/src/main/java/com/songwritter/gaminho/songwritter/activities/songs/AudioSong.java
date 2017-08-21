@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +36,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
 
 public class AudioSong extends Fragment {
@@ -66,7 +69,6 @@ public class AudioSong extends Fragment {
         } else {
             tvLyrics.setVisibility(View.VISIBLE);
             mLVBeats.setVisibility(View.GONE);
-            tvLyrics.setText(getString(R.string.no_beats));
         }
     }
 
@@ -146,7 +148,6 @@ public class AudioSong extends Fragment {
         }
     }
 
-    // Set up view
     private ListView setUpListView(ListView listView){
         mAdapter = new InstrumentalAdapter(getActivity(), R.layout.adapter_beats, mListBeats);
         listView.setVisibility(View.VISIBLE);
@@ -289,9 +290,13 @@ public class AudioSong extends Fragment {
 
                 Instrumental instrumental = new Instrumental(etBeatName.getText().toString(),
                         file.getPath(), typeBeat, etBeatAuthor.getText().toString());
-                if(isInstrumentalValid(instrumental)) {
+
+                try{
+                    instrumental.isValid();
                     mListener.addABeat(instrumental);
                     dialog.dismiss();
+                } catch(Exception e){
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -303,31 +308,6 @@ public class AudioSong extends Fragment {
         });
 
         return builder;
-    }
-
-    private boolean isInstrumentalValid(Instrumental instrumental){
-        if(instrumental.getPath() == null || instrumental.getPath().isEmpty()){
-            Toast.makeText(getActivity(), getString(R.string.null_path), Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        else if(instrumental.getTitle() == null || instrumental.getTitle().isEmpty()){
-            Toast.makeText(getActivity(), getString(R.string.null_title), Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        else if(instrumental.getAuthor() == null || instrumental.getAuthor().isEmpty()){
-            Toast.makeText(getActivity(), getString(R.string.null_author), Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        else if(instrumental.getType() == null){
-            Toast.makeText(getActivity(), getString(R.string.null_type), Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-        else
-            return true;
     }
 
     public void updatePauseUI(int mediaPosition){

@@ -19,6 +19,7 @@ import com.songwritter.gaminho.songwritter.R;
 import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.beans.Action;
 import com.songwritter.gaminho.songwritter.beans.Instrumental;
+import com.songwritter.gaminho.songwritter.beans.MemoRecord;
 import com.songwritter.gaminho.songwritter.beans.SongLyrics;
 import com.songwritter.gaminho.songwritter.customviews.CustomAlertDialogBuilder;
 import com.songwritter.gaminho.songwritter.customviews.MusicPlayer;
@@ -483,7 +484,87 @@ public class ActivitySong extends AppCompatActivity implements SongInteractionLi
                 file.delete();
             }
         }
+    }
 
+    @Override
+    public void addARecord(final MemoRecord record) {
+
+        String sourcePath = getExternalFilesDir(null).toString();
+        File src = new File(record.getPath());
+        File dest = new File(sourcePath + "/records/" + record.getTitle());
+        if(!src.exists()){
+            Toast.makeText(getApplicationContext(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            if(!Utils.moveFile(src, dest, getApplication())){
+                Toast.makeText(getApplicationContext(), "Can not move record file", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                //Update path with new one
+                record.setPath(dest.getAbsolutePath());
+                final List<MemoRecord> records = mSongLyrics.getMemoRecords() != null ? mSongLyrics.getMemoRecords() : new ArrayList<MemoRecord>();
+                records.add(record);
+                mSongLyrics.setMemoRecords(records);
+                mSongLyrics.setId(null);
+                mSongLyrics.setLastUpdate(System.currentTimeMillis());
+
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put(mSongKey, mSongLyrics);
+                DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+                ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                        mPBSongs.setVisibility(View.GONE);
+                        if (databaseError != null) {
+                            Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            mCurrentSection = -1;
+                            selectTab(SECTION_RECORDS);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public void removeRecords(List<MemoRecord> recordsToRemove) {
+        List<MemoRecord> newList = new ArrayList<>();
+
+        List<String> namesToRemove = new ArrayList<>();
+        for(MemoRecord memo : recordsToRemove)
+            namesToRemove.add(memo.getTitle());
+
+        for(MemoRecord memo : getSongLyrics().getMemoRecords()){
+            if(!namesToRemove.contains(memo.getTitle()))
+                newList.add(memo);
+        }
+
+        mSongLyrics.setId(null);
+        mSongLyrics.setMemoRecords(newList);
+        mSongLyrics.setLastUpdate(System.currentTimeMillis());
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(mSongKey, mSongLyrics);
+        DatabaseReference ref = Database.getTable(mAuth.getCurrentUser(), Database.Table.LYRICS);
+        ref.updateChildren(childUpdates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+
+                mPBSongs.setVisibility(View.GONE);
+                if (databaseError != null) {
+                    Toast.makeText(getApplication(), databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        for(MemoRecord memo : recordsToRemove){
+            File file = new File(memo.getPath());
+            if(file.exists()) {
+                file.delete();
+            }
+        }
     }
 
     // Utils

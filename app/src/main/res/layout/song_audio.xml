@@ -4,14 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <TextView style="@style/TopMessage"
         android:id="@+id/no_beat"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="@string/no_beats"
-        android:textStyle="bold"/>
+        android:text="@string/no_beats"/>
 
     <ListView
         android:id="@+id/beats_list"

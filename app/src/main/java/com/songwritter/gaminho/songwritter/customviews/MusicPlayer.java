@@ -110,7 +110,6 @@ public class MusicPlayer extends LinearLayout implements
         mPlayer = new MediaPlayer();
         mPlayer.setOnCompletionListener(this);
 
-
         if (context instanceof MusicPlayerListener) {
             mListener = (MusicPlayerListener) context;
         } else {

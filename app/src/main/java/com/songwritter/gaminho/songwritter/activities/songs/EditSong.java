@@ -67,20 +67,6 @@ public class EditSong extends Fragment {
         mListener = null;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.action_save){
-            if(needUpdate())
-                mListener.updateSong(getSongLyricsFromUI());
-            else
-                Toast.makeText(getContext(), getString(R.string.no_update), Toast.LENGTH_SHORT).show();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     public boolean needUpdate(){
         return !getSongLyricsFromUI().getTitle().equals(mListener.getSongLyrics().getTitle())
                 || !getSongLyricsFromUI().getContent().equals(mListener.getSongLyrics().getContent());
