@@ -153,7 +153,7 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         super.onStop();
         mRecordButton.stopListening();
         if(isPlaying()) {
-            mPlayer.stop();
+            mAdapter.stopPlaying();
         }
         mPlayer = null;
     }
@@ -251,7 +251,7 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
     }
 
     public boolean isPlaying(){
-        return mPlayer != null && mPlayer.isPlaying();
+        return mAdapter != null && mAdapter.isPlaying();
     }
 
     private ListView setUpListView(ListView listView){
@@ -261,18 +261,16 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                LOG("Click: " + isPlaying());
                 if (!isSelecting()) {
 
-                    if (!isPlaying()) {
-                        File file = new File(mRecordings.get(position).getPath());
-                        if (file.exists()) {
-                            startPlaying(file);
-                        } else {
-                            Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
-                        }
+                    File file = new File(mRecordings.get(position).getPath());
+                    if (file.exists()) {
+                        mAdapter.playSongAtPosition(position);
                     }
-                    else{
-                        stopPlaying();
+                    else {
+                        Toast.makeText(getActivity(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
@@ -323,7 +321,6 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
                     }
                 }, Visualizer.getMaxCaptureRate() / 2, true, false);
     }
-
 
     private void startPlaying(File file){
         mPlayer = new MediaPlayer();

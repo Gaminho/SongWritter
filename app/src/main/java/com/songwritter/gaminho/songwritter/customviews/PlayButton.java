@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.songwritter.gaminho.songwritter.R;
-import com.songwritter.gaminho.songwritter.interfaces.ValueChangeListener;
 
 import java.io.File;
 import java.io.IOException;
