@@ -181,7 +181,7 @@ public class MusicPlayer extends LinearLayout implements
         mProgress.setProgress(0);
         mProgress.setMax(mediaDuration);
 
-        mTVMediaDuration.setText(Utils.milliSecondsToTimer(mediaDuration));
+        mTVMediaDuration.setText(Utils.milliSecondsToTimer(mediaDuration, true));
 
         mPlayer.start();
 
@@ -261,7 +261,7 @@ public class MusicPlayer extends LinearLayout implements
     private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
 
-            mTVCurrentPosition.setText(Utils.milliSecondsToTimer(mPlayer.getCurrentPosition()));
+            mTVCurrentPosition.setText(Utils.milliSecondsToTimer(mPlayer.getCurrentPosition(), true));
             mProgress.setProgress(mPlayer.getCurrentPosition());
             mHandler.postDelayed(this, 200);
         }

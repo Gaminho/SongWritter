@@ -31,6 +31,7 @@
     <string name="example_date">15/08/2017</string>
     <string name="example_lyrics_update">10h55:42</string>
     <string name="example_song_current_second">0:00</string>
+    <string name="example_current_recording">0:00.13</string>
 
     <!-- Hints -->
     <string name="hint_mail">Adresse mail</string>

@@ -77,7 +77,7 @@ public class RecordAdapter extends ArrayAdapter<MemoRecord> {
         MemoRecord record = getItem(position);
         holder.mTVTitle.setText(record.getTitle());
         holder.mTVCreation.setText(Utils.formatTS(record.getCreation(), Utils.DateFormat.FULL));
-        holder.mTVDuration.setText(Utils.milliSecondsToTimer(record.getDuration()));
+        holder.mTVDuration.setText(Utils.milliSecondsToTimer(record.getDuration(), true));
 
         if(!selectionMode) {
             //LOG("Not Selection Mode");
@@ -93,6 +93,7 @@ public class RecordAdapter extends ArrayAdapter<MemoRecord> {
         else{
             if(position == playingPosition){
                 mSeekBar = holder.mSeekBar;
+                mSeekBar.setEnabled(false);
                 mTVCurrentPosition = holder.mTVPosition;
             }
             else{
@@ -226,8 +227,7 @@ public class RecordAdapter extends ArrayAdapter<MemoRecord> {
                 mTVCurrentPosition.setVisibility(View.VISIBLE);
                 mSeekBar.setMax(mediaDuration);
                 mSeekBar.setProgress(mPlayer.getCurrentPosition());
-                mTVCurrentPosition.setText(Utils.milliSecondsToTimer(mPlayer.getCurrentPosition()));
-                LOG("Position: " + mPlayer.getCurrentPosition());
+                mTVCurrentPosition.setText(Utils.milliSecondsToTimer(mPlayer.getCurrentPosition(), true));
             }
             else
                 notifyDataSetChanged();

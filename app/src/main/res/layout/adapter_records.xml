@@ -22,6 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="5dp"
                 android:thumb="@null"
+                android:nestedScrollingEnabled="false"
                 android:layout_alignParentBottom="true"
                 android:progressDrawable="@drawable/listen_progress_recycler"/>
 

@@ -4,7 +4,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.MediaRecorder;
 import android.support.design.widget.FloatingActionButton;
@@ -85,6 +84,16 @@ public class RecordButton extends FloatingActionButton {
         }
     }
 
+    public void unregisterMediaRecorderListener(){
+        mListener = null;
+        mStartRecording = true;
+        setImageDrawable(stdImg);
+        setColorFilter(tintStd);
+        if(mRecorder!= null)
+            mRecorder.release();
+        mRecorder = null;
+    }
+
     private void onRecord(boolean start) {
         if (start) {
             startRecording();
@@ -130,6 +139,8 @@ public class RecordButton extends FloatingActionButton {
     public void stopListening(){
         assert mListener != null;
         mListener = null;
+        if(mStartRecording)
+            mStartRecording = false;
     }
 
     private void init(Context context){

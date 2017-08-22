@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
-import android.media.audiofx.Visualizer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,8 +28,6 @@ import com.songwritter.gaminho.songwritter.Utils;
 import com.songwritter.gaminho.songwritter.adapters.RecordAdapter;
 import com.songwritter.gaminho.songwritter.beans.MemoRecord;
 import com.songwritter.gaminho.songwritter.customviews.CustomAlertDialogBuilder;
-import com.songwritter.gaminho.songwritter.customviews.MyVisualizer;
-import com.songwritter.gaminho.songwritter.customviews.PlayButton;
 import com.songwritter.gaminho.songwritter.customviews.RecordButton;
 import com.songwritter.gaminho.songwritter.interfaces.SongInteractionListener;
 
@@ -39,11 +36,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.songwritter.gaminho.songwritter.Utils.LOG;
 
-public class RecordSong extends Fragment implements RecordButton.OnRecordingListener,
-        PlayButton.OnPlayingListener {
+public class RecordSong extends Fragment implements RecordButton.OnRecordingListener {
 
     @Nullable
     private
@@ -52,14 +50,29 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     private ListView mLVRecords;
+    private TextView mTVRecordingTimer;
+    private TextView mTVNoRecord;
 
     private RecordButton mRecordButton;
-    //private PlayButton mPlayButton;
 
     private List<MemoRecord> mRecordings;
     private RecordAdapter mAdapter;
 
-    private MediaPlayer mPlayer;
+    private Timer mTimer;
+    private final TimerTask mTimerTask = new TimerTask() {
+        @Override
+        public void run() {
+            assert mTVRecordingTimer != null;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTVRecordingTimer.setText(Utils.milliSecondsToTimer((System.currentTimeMillis() - recordingStartTS), false));
+                }
+            });
+        }
+    };
+    private long recordingStartTS;
+    private static final long UPDATE_TIMER_DELAY = 10;
 
 
     // Requesting permission to RECORD_AUDIO
@@ -79,11 +92,6 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
 
         List<MemoRecord> recordings = mListener.getSongLyrics().getMemoRecords();
         mRecordings = recordings != null ? recordings : new ArrayList<MemoRecord>();
-
-//        mRecordings.add(new MemoRecord("path", "Title", "Gaminho", System.currentTimeMillis(), Long.MAX_VALUE));
-//        mRecordings.add(new MemoRecord("path2", "Title2", "Gaminho", System.currentTimeMillis() - 152214521, Long.MAX_VALUE - 15236455));
-//        mRecordings.add(new MemoRecord("path3", "Title3", "Gaminho", System.currentTimeMillis(), Long.MAX_VALUE));
-
         setHasOptionsMenu(true);
     }
 
@@ -96,14 +104,14 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         mRecordButton = (RecordButton) view.findViewById(R.id.recorder);
         mRecordButton.registerMediaRecorderListener(this);
 
-//        mPlayButton = (PlayButton) view.findViewById(R.id.btn_player);
-//        mPlayButton.registerMediaPlayerListener(this);
+        mTVNoRecord = (TextView) view.findViewById(R.id.no_record);
+
+        mTVRecordingTimer = (TextView) view.findViewById(R.id.recording_timer);
+        mTVRecordingTimer.setVisibility(View.GONE);
 
         ActivityCompat.requestPermissions(getActivity(), permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
         mLVRecords = (ListView) view.findViewById(R.id.records_list);
-
-        visualizerView = (MyVisualizer) view.findViewById(R.id.my_visu);
 
         return view;
     }
@@ -119,7 +127,7 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         else{
             menu.findItem(R.id.action_delete).setVisible(false);
             menu.findItem(R.id.action_save).setVisible(false);
-            menu.findItem(R.id.action_add).setVisible(true);
+            menu.findItem(R.id.action_add).setVisible(false);
         }
     }
 
@@ -137,13 +145,14 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
     public void onResume() {
         super.onResume();
 
-        TextView tvLyrics = (TextView) getView().findViewById(R.id.no_record);
+        mRecordButton.registerMediaRecorderListener(this);
 
         if (!mRecordings.isEmpty()) {
-            tvLyrics.setVisibility(View.GONE);
+            mTVNoRecord.setVisibility(View.GONE);
+            mTVRecordingTimer.setVisibility(View.GONE);
             mLVRecords = setUpListView(mLVRecords);
         } else {
-            tvLyrics.setVisibility(View.VISIBLE);
+            mTVNoRecord.setVisibility(View.VISIBLE);
             mLVRecords.setVisibility(View.GONE);
         }
     }
@@ -155,64 +164,17 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         if(isPlaying()) {
             mAdapter.stopPlaying();
         }
-        mPlayer = null;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case REQUEST_RECORD_AUDIO_PERMISSION:
-                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                break;
+        try{
+            mTimer.cancel();
+            mTimer.purge();
+            LOG("onStop: cancel Timer");
+        } catch (Exception e){
+            LOG("Timer already cancel!");
         }
-        if (!permissionToRecordAccepted )
-            getActivity().finish();
-    }
-
-    @Override
-    public void stopRecording(File record) {
-        LOG("Dans le fragment, stopRecording");
-        //mPlayButton.setMedia(record.getAbsolutePath());
-        //mPlayButton.setEnabled(true);
-        addMemoDialog(record).show();
-    }
-
-    @Override
-    public void startRecording() {
-        LOG("Dans le fragment, startRecording");
-        //mPlayButton.setEnabled(false);
-    }
-
-    @Override
-    public void stopPlaying() {
-        LOG("Dans le fragment, stopPlaying");
-        mRecordButton.setEnabled(true);
-        mPlayer.stop();
-        mPlayer.release();
-        mPlayer = null;
-    }
-
-    @Override
-    public void startPlaying() {
-        LOG("Dans le fragment, startPlaying");
-        mRecordButton.setEnabled(false);
-        setupVisualizerFxAndUI();
-        mVisualizer.setEnabled(true);
-    }
-
-    @Override
-    public void setPlaying(boolean isPlaying) {
-        LOG("Dans le fragment, setPlaying: " + isPlaying);
-//        if(isPlaying)
-//            mRecordButton.setEnabled(false);
-//        else
-//            mRecordButton.setEnabled(true);
-    }
-
-    @Override
-    public void mediaHasBeenUpdated(String filename) {
-        LOG("Dans le fragment, mediaHasBeenUpdated");
+        mTimer = null;
+        if(mAdapter != null){
+            mRecordButton.unregisterMediaRecorderListener();
+        }
     }
 
     @Override
@@ -232,19 +194,50 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         mListener = null;
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        if(id == R.id.action_save){
-//            if(needUpdate())
-//                mListener.updateSong(getSongLyricsFromUI());
-//            else
-//                Toast.makeText(getContext(), getString(R.string.no_update), Toast.LENGTH_SHORT).show();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
+        }
+        if (!permissionToRecordAccepted )
+            getActivity().finish();
+    }
+
+
+    // Interface
+
+    @Override
+    public void stopRecording(File record) {
+        addMemoDialog(record).show();
+        mTimer.cancel();
+        mTimer.purge();
+    }
+
+    @Override
+    public void startRecording() {
+        mTVRecordingTimer.setVisibility(View.VISIBLE);
+        recordingStartTS = System.currentTimeMillis();
+        mTimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                assert mTVRecordingTimer != null;
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTVRecordingTimer.setText(Utils.milliSecondsToTimer((System.currentTimeMillis() - recordingStartTS), false));
+                    }
+                });
+            }
+        };
+        mTimer.schedule(timerTask, 0, UPDATE_TIMER_DELAY);
+    }
+
+
+    // Utils
 
     public boolean isSelecting(){
         return mAdapter != null && mAdapter.isSelecting();
@@ -297,42 +290,6 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
         getActivity().invalidateOptionsMenu();
     }
 
-
-    /*
-    HEY HEY VISUALIZE
-     */
-    private MyVisualizer visualizerView;
-    private Visualizer mVisualizer;
-
-
-    private void setupVisualizerFxAndUI() {
-
-        // Create the Visualizer object and attach it to our media player.
-        mVisualizer = new Visualizer(mPlayer.getAudioSessionId());
-        mVisualizer.setCaptureSize(Visualizer.getCaptureSizeRange()[1]);
-        mVisualizer.setDataCaptureListener(
-                new Visualizer.OnDataCaptureListener() {
-                    public void onWaveFormDataCapture(Visualizer visualizer, byte[] bytes, int samplingRate) {
-                        visualizerView.updateVisualizer(bytes);
-                    }
-
-                    public void onFftDataCapture(Visualizer visualizer,
-                                                 byte[] bytes, int samplingRate) {
-                    }
-                }, Visualizer.getMaxCaptureRate() / 2, true, false);
-    }
-
-    private void startPlaying(File file){
-        mPlayer = new MediaPlayer();
-        try {
-            mPlayer.setDataSource(file.getPath());
-            mPlayer.prepare();
-            mPlayer.start();
-            mRecordButton.setEnabled(false);
-        } catch (IOException e) {
-            Toast.makeText(getContext(), getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
-        }
-    }
     // Dialog
 
     private CustomAlertDialogBuilder addMemoDialog(final File outputRecord){
@@ -368,6 +325,7 @@ public class RecordSong extends Fragment implements RecordButton.OnRecordingList
                     memoRecord.isValid();
                     mListener.addARecord(memoRecord);
                     dialog.dismiss();
+                    mTVRecordingTimer.setVisibility(View.GONE);
                 } catch(Exception e){
                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                 }

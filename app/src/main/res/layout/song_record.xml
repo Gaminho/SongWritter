@@ -8,26 +8,40 @@
         android:id="@+id/no_record"
         android:text="@string/no_records"/>
 
-    <com.songwritter.gaminho.songwritter.customviews.MyVisualizer
-        android:id="@+id/my_visu"
+    <TextView
+        android:id="@+id/recording_timer"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="@color/colorPrimaryLight"
-        android:layout_below="@+id/no_record"/>
+        android:layout_below="@id/no_record"
+        android:text="@string/example_current_recording"
+        android:gravity="center"
+        android:textSize="40dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimaryDarkest"
+        android:layout_height="120dp"
+        android:background="@color/colorPrimaryLight"/>
 
     <ListView
         android:id="@+id/records_list"
-        android:layout_below="@+id/my_visu"
+        android:layout_below="@+id/recording_timer"
+        android:layout_above="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.songwritter.gaminho.songwritter.customviews.RecordButton
-        android:id="@+id/recorder"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="@dimen/fab_margin"/>
+    <RelativeLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <com.songwritter.gaminho.songwritter.customviews.RecordButton
+            android:id="@+id/recorder"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
 
     <com.songwritter.gaminho.songwritter.customviews.PlayButton
         android:id="@+id/btn_player"
@@ -37,5 +51,7 @@
         android:layout_alignParentStart="true"
         android:visibility="gone"
         android:layout_margin="@dimen/fab_margin"/>
+
+
 
 </RelativeLayout>
